@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
@@ -26,6 +27,7 @@ public class NewsActivity extends AppCompatActivity {
     private List<NewsData> newsDataList = new ArrayList<NewsData>();
     private final static String fileName = "data.json";
     private ListView newsList;
+    private ImageView back;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,14 @@ public class NewsActivity extends AppCompatActivity {
         if (actionBar != null){
             actionBar.hide();
         }
+        back = (ImageView) findViewById(R.id.back);
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         String str = (String) getJson(fileName,NewsActivity.this);
         parseJSONWithGSON(str);
         NewsAdapter adapter = new NewsAdapter(this,R.layout.news_item,newsDataList);
@@ -53,7 +63,6 @@ public class NewsActivity extends AppCompatActivity {
 
     private void parseJSONWithGSON(String jsonData){
         Gson gson = new Gson();
-        // ArrayList<Data> dataList =  new ArrayList<Data>();
         List<Data> DataList = gson.fromJson(jsonData,new TypeToken<List<Data>>(){}.getType());
         for (Data news : DataList){
             NewsData newsData = new NewsData();
