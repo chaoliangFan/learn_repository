@@ -1,234 +1,216 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#f5f5f5"
-    android:divider="@drawable/shapee"
+    android:orientation="vertical"
     android:showDividers="middle">
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="150px"
-        android:orientation="horizontal"
-        android:background="#e04f4c">
+        android:layout_height="50dp"
+        android:background="#e04f4c"
+        android:orientation="horizontal">
         <ImageView
             android:id="@+id/back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_margin="30px"
+            android:layout_margin="15dp"
             android:src="@drawable/calendar_icon_back"/>
         <TextView
             android:id="@+id/text_litil"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginRight="40dp"
             android:layout_weight="1"
-            android:text="关于我们"
-            android:textSize="25sp"
             android:gravity="center"
+            android:text="@string/about_us"
             android:textColor="#fff"
+            android:textSize="20sp"
             />
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <ImageView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/about_img_logo"
-            android:layout_marginTop="80px"
-            android:layout_marginBottom="78px"
-            android:layout_gravity="center"/>
-    </LinearLayout>
-
+        android:layout_gravity="center"
+        android:layout_marginBottom="39dp"
+        android:layout_marginTop="40dp"
+        android:src="@drawable/about_img_logo"/>
     <View
         android:layout_width="match_parent"
-        android:layout_height="1px"
+        android:layout_height="1dp"
         android:background="#eaeaea"  />
-
-
     <LinearLayout
+        android:id="@+id/version"
         android:layout_width="match_parent"
-        android:layout_height="130px"
-        android:orientation="horizontal"
-        android:background="#fff">
+        android:layout_height="50dp"
+        android:background="@drawable/color_select"
+        android:clickable="true"
+        android:orientation="horizontal">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginLeft="30px"
+            android:layout_marginLeft="15dp"
             android:gravity="center"
-            android:text="版本信息:V1.0"
+            android:text="@string/version"
             android:textColor="#444444"
             android:textSize="14sp" />
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <ImageView
-                android:id="@+id/go_on1"
+                android:id="@+id/go_version"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
                 android:layout_gravity="center_vertical|right"
-                android:layout_marginRight="30px"
+                android:layout_marginRight="15dp"
                 android:src="@drawable/calendar_icon_right_arrow" />
             <TextView
-                 android:id="@+id/textView"
                  android:layout_width="wrap_content"
                  android:layout_height="match_parent"
-                 android:layout_toLeftOf="@id/go_on1"
-                 android:layout_marginRight="18px"
+                 android:layout_marginRight="9dp"
+                 android:layout_toLeftOf="@id/go_version"
                  android:gravity="center"
-                 android:text="已是最新版本"
+                 android:text="@string/latest_version"
                  android:textColor="#999999"
                  android:textSize="12sp" />
         </RelativeLayout>
     </LinearLayout>
-
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#eaeaea"  />
-
-
     <RelativeLayout
+        android:id="@+id/web_version"
         android:layout_width="match_parent"
-        android:layout_height="130px"
-        android:background="#fff">
+        android:layout_height="50dp"
+        android:background="@drawable/color_select"
+        android:clickable="true">
         <TextView
-            android:id="@+id/text_view_o2"
+            android:id="@+id/phone_web"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_gravity="center_vertical|left"
-            android:layout_marginLeft="30px"
-            android:background="#ffffff"
+            android:layout_marginLeft="15dp"
             android:gravity="center"
-            android:text="手机网页版 : "
+            android:text="@string/web_version"
             android:textColor="#444444"
             android:textSize="14sp" />
         <TextView
             android:id="@+id/url"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_toRightOf="@id/phone_web"
             android:gravity="center|left"
-            android:layout_toRightOf="@id/text_view_o2"
             android:text="http://tools.2345.com/m/rili.htm"
             android:textColor="#e04f4c"
-            android:textSize="14sp"
-            android:background="#ffffff"/>
+            android:textSize="14sp"/>
         <ImageView
-            android:id="@+id/go_on2"
+            android:id="@+id/go_web_version"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_gravity="center_vertical|right"
-            android:layout_marginRight="30px"
+            android:layout_marginRight="15dp"
             android:src="@drawable/calendar_icon_right_arrow" />
     </RelativeLayout>
-
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#eaeaea"  />
-
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="130px"
-        android:background="#fff">
+        android:layout_height="50dp"
+        android:background="@drawable/color_select"
+        android:clickable="true">
         <TextView
-            android:id="@+id/text_view_03"
+            android:id="@+id/qq_group"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_gravity="center_vertical|left"
-            android:layout_marginLeft="30px"
-            android:background="#ffffff"
+            android:layout_marginLeft="15dp"
             android:gravity="center"
-            android:text="官方QQ群 : "
+            android:text="@string/qq_group"
             android:textColor="#444444"
             android:textSize="14sp" />
         <TextView
-            android:id="@+id/urlqq"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_toRightOf="@id/text_view_03"
+            android:layout_toRightOf="@id/qq_group"
             android:gravity="center|left"
             android:text="469503178"
             android:textColor="#e04f4c"
-            android:textSize="14sp"
-            android:background="#ffffff"/>
+            android:textSize="14sp"/>
         <ImageView
-            android:id="@+id/go_on3"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_gravity="center_vertical|right"
-            android:layout_marginRight="30px"
+            android:layout_marginRight="15dp"
             android:src="@drawable/calendar_icon_right_arrow" />
     </RelativeLayout>
-
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#eaeaea"  />
-
     <RelativeLayout
+        android:id="@+id/statement"
         android:layout_width="match_parent"
-        android:layout_height="130px"
-        android:background="#fff">
-        <TextView
-            android:id="@+id/text_view_o4"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_gravity="center_vertical|left"
-            android:layout_marginLeft="30px"
-            android:background="#ffffff"
-            android:gravity="center"
-            android:text="免责声明"
-            android:textColor="#444444"
-            android:textSize="14sp" />
-        <ImageView
-            android:id="@+id/go_on4"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_gravity="center_vertical|right"
-            android:layout_marginRight="30px"
-            android:src="@drawable/calendar_icon_right_arrow" />
-    </RelativeLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#eaeaea"  />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="130px"
-        android:background="#fff">
+        android:layout_height="50dp"
+        android:background="@drawable/color_select"
+        android:clickable="true">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_gravity="center_vertical|left"
-            android:layout_marginLeft="30px"
+            android:layout_marginLeft="15dp"
             android:gravity="center"
-            android:text="留言板"
+            android:text="@string/statement"
             android:textColor="#444444"
             android:textSize="14sp" />
         <ImageView
-            android:id="@+id/go_on5"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_gravity="center_vertical|right"
-            android:layout_marginRight="30px"
+            android:layout_marginRight="15dp"
             android:src="@drawable/calendar_icon_right_arrow" />
     </RelativeLayout>
-
-
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#eaeaea"  />
+    <RelativeLayout
+        android:id="@+id/message_board"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/color_select"
+        android:clickable="true">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_gravity="center_vertical|left"
+            android:layout_marginLeft="15dp"
+            android:gravity="center"
+            android:text="@string/message_board"
+            android:textColor="#444444"
+            android:textSize="14sp" />
+        <ImageView
+            android:id="@+id/go_message_board"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="center_vertical|right"
+            android:layout_marginRight="15dp"
+            android:src="@drawable/calendar_icon_right_arrow" />
+    </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#eaeaea"  />
 </LinearLayout>
