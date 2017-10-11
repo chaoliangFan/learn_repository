@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.fanxh.weixin_and_news">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -18,8 +18,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".WeiXin" />
-        <activity android:name=".Wei_XinActivity" />
+        <activity android:name=".WeChatActivity" />
         <activity android:name=".NewsActivity"></activity>
     </application>
 

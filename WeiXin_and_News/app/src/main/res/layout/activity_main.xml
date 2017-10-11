@@ -6,19 +6,10 @@
         android:id="@+id/wei_xin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="微信"/>
-
+        android:text="@string/main_weixin"/>
     <Button
         android:id="@+id/news"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="新闻"/>
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="button"/>
-
-
+        android:text="@string/main_news"/>
     </LinearLayout>

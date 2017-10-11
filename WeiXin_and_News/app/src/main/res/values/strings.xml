@@ -1,12 +1,10 @@
 <resources>
     <string name="app_name">WeiXin_and_News</string>
-
-
+    <string name="main_weixin">微信</string>
+    <string name="main_news">新闻</string>
     <string name="me">我</string>
-
     <string name="name">Name</string>
     <string name="number">微信号：number</string>
-
     <string name="personal_information">个人信息</string>
     <string name="wallet">钱包</string>
     <string name="collect">收藏</string>
@@ -14,8 +12,5 @@
     <string name="card_bag">卡包</string>
     <string name="expression">表情</string>
     <string name="set">设置</string>
-
-
-
     <string name="news">新闻展示界面</string>
 </resources>

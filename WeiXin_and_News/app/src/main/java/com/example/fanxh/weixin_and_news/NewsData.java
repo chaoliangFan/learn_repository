@@ -5,47 +5,89 @@ package com.example.fanxh.weixin_and_news;
  */
 
 public class NewsData {
-    private String newsImgUrl;
-    private String newsTitle;
-    private String newsDetails;
-    private String newsUrl;
+    private String icon;
+    private String title;
+    private String desc;
+    private String url;
 
-    public NewsData(){
-        this.newsImgUrl = newsImgUrl;
-        this.newsTitle = newsTitle;
-        this.newsDetails = newsDetails;
-        this.newsUrl = newsUrl;
+    public NewsData(String icon, String title, String desc, String url) {
+        this.icon = icon;
+        this.title = title;
+        this.desc = desc;
+        this.url = url;
     }
 
-    public String getNewsImgUrl() {
-        return newsImgUrl;
+    public String getIcon() {
+        return icon;
     }
 
-    public void setNewsImgUrl(String newsImgUrl) {
-        this.newsImgUrl = newsImgUrl;
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
-    public String getNewsTitle() {
-        return newsTitle;
+    public String getTitle() {
+        return title;
     }
 
-    public void setNewsTitle(String newsTitle) {
-        this.newsTitle = newsTitle;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getNewsDetails() {
-        return newsDetails;
+    public String getDesc() {
+        return desc;
     }
 
-    public void setNewsDetails(String newsDetails) {
-        this.newsDetails = newsDetails;
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
-    public String getNewsUrl() {
-        return newsUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public void setNewsUrl(String newsUrl) {
-        this.newsUrl = newsUrl;
+    public void setUrl(String url) {
+        this.url = url;
     }
+    //
+//    @Override
+//    public String toString() {
+//        return "NewsData{" +
+//                "icon='" + icon + '\'' +
+//                ", title='" + title + '\'' +
+//                ", desc='" + desc + '\'' +
+//                ", url='" + url + '\'' +
+//                '}';
+//    }
+//
+//    public String getImgUrl() {
+//        return icon;
+//    }
+//
+//    public void setImgUrl(String icon) {
+//        this.icon = icon;
+//    }
+//
+//    public String getTitle() {
+//        return title;
+//    }
+//
+//    public void setTitle(String title) {
+//        this.title = title;
+//    }
+//
+//    public String getDetails() {
+//        return desc;
+//    }
+//
+//    public void setDetails(String desc) {
+//        this.desc = desc;
+//    }
+//
+//    public String getUrl() {
+//        return url;
+//    }
+//
+//    public void setUrl(String url) {
+//        this.url = url;
+//    }
 }
