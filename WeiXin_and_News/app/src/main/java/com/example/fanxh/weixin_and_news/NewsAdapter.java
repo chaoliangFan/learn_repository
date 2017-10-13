@@ -3,117 +3,143 @@ package com.example.fanxh.weixin_and_news;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Handler;
-import android.os.Message;
-import android.support.annotation.IdRes;
-import android.support.annotation.LayoutRes;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.INotificationSideChannel;
+import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
-import java.util.Objects;
-
-import static android.R.attr.bitmap;
 
 /**
  * Created by fanxh on 2017/10/8.
  */
 
 public class NewsAdapter extends ArrayAdapter {
-    private int resourceId;
-    private static final int SHOW_RESPONSE = 1;
-    private ImageView newsImage;
-    ViewHolder viewHolder;
-    Bitmap bitmap;
-    private Handler handler = new Handler() {
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case SHOW_RESPONSE:
-                    bitmap = (Bitmap) msg.obj;
-                    viewHolder.newsImage.setImageBitmap(bitmap);
-                    //                 newsImage.setImageBitmap(bitmap);
-            }
-        }
-    };
+    private ListView mListView;
+//    private ImageView newsImage;
+
+    /**
+     * LruCache 缓存图片
+     */
+    private LruCache<String, BitmapDrawable> mMemoryCache;
 
     public NewsAdapter(@NonNull Context context, int textViewResourceId, @NonNull List<NewsData> objects) {
         super(context, textViewResourceId, objects);
-        resourceId = textViewResourceId;
+        int maxMemory = (int) Runtime.getRuntime().maxMemory();
+        int cacheSize = maxMemory / 8;
+        mMemoryCache = new LruCache<String, BitmapDrawable>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, BitmapDrawable drawable) {
+                return drawable.getBitmap().getByteCount();
+            }
+        };
     }
 
-    @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        if (mListView == null) {
+            mListView = (ListView) parent;
+        }
         NewsData newsData = (NewsData) getItem(position);
         View view;
         if (convertView == null) {
-            view = LayoutInflater.from(getContext()).inflate(resourceId, null);
-            viewHolder = new ViewHolder();
-            viewHolder.newsImage = (ImageView) view.findViewById(R.id.news_image);
-            viewHolder.newsTitleText = (TextView) view.findViewById(R.id.news_title);
-            viewHolder.newsDetailsText = (TextView) view.findViewById(R.id.news_details);
-            view.setTag(viewHolder);
+            view = LayoutInflater.from(getContext()).inflate(R.layout.news_item, null);
         } else {
             view = convertView;
-            viewHolder = (ViewHolder) view.getTag();
         }
-//if (getImageViewInputStream(newsData.getImgUrl()))
-        getImageViewInputStream(newsData.getIcon());
-//        viewHolder.newsImage.setImageBitmap(bitmap);
-        viewHolder.newsTitleText.setText(newsData.getTitle());
-        viewHolder.newsDetailsText.setText(newsData.getDesc());
+        ImageView newsImage = (ImageView) view.findViewById(R.id.news_image);
+        TextView newsTitleText = (TextView) view.findViewById(R.id.news_title);
+        TextView newsDetailsText = (TextView) view.findViewById(R.id.news_details);
+        newsImage.setTag(newsData.getIcon());
+        BitmapDrawable drawable = getBitmapFromMemoryCache(newsData.getIcon());
+        if (drawable != null) {
+            newsImage.setImageDrawable(drawable);
+        } else {
+            BitmapWorkerTask task = new BitmapWorkerTask();
+            task.execute(newsData.getIcon());
+        }
+        newsTitleText.setText(newsData.getTitle());
+        newsDetailsText.setText(newsData.getDesc());
         return view;
     }
 
-    class ViewHolder {
-        ImageView newsImage;
-        TextView newsTitleText;
-        TextView newsDetailsText;
+    /**
+     * 将一张图片存储到LruCache中
+     */
+    public void addBitmapToMemoryCache(String key, BitmapDrawable drawable) {
+        if (getBitmapFromMemoryCache(key) == null) {
+            mMemoryCache.put(key, drawable);
+        }
     }
 
-    public void getImageViewInputStream(final String string) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                InputStream inputStream = null;
-                Bitmap bitmap = null;
-                try {
-                    URL url = new URL(string);
-                    if (url != null) {
-                        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                        httpURLConnection.setConnectTimeout(3000);
-                        httpURLConnection.setRequestMethod("GET");
-                        httpURLConnection.setDoInput(true);
-                        int responseCode = httpURLConnection.getResponseCode();
-                        Log.d("*****", "ssss" + responseCode);
-                        if (responseCode == httpURLConnection.HTTP_OK) {
-                            inputStream = httpURLConnection.getInputStream();
-                            bitmap = BitmapFactory.decodeStream(inputStream);
-                            Log.d("*******qqqqqqqqq", "hh");
-                            Message message = new Message();
-                            message.what = SHOW_RESPONSE;
-                            message.obj = bitmap;
-                            handler.sendMessage(message);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+    /**
+     * 从LruCache中去一张图片
+     */
+    public BitmapDrawable getBitmapFromMemoryCache(String key) {
+        return mMemoryCache.get(key);
+    }
+
+    /**
+     * 异步下载图片
+     */
+    class BitmapWorkerTask extends AsyncTask<String, Void, BitmapDrawable> {
+
+        String imageUrl;
+
+        @Override
+        protected BitmapDrawable doInBackground(String... params) {
+            imageUrl = params[0];
+            // 在后台开始下载图片
+            Bitmap bitmap = getImageViewInputStream(imageUrl);
+            BitmapDrawable drawable = new BitmapDrawable(getContext().getResources(), bitmap);
+            addBitmapToMemoryCache(imageUrl, drawable);
+            return drawable;
+        }
+
+        @Override
+        protected void onPostExecute(BitmapDrawable drawable) {
+            ImageView imageView = (ImageView) mListView.findViewWithTag(imageUrl);
+            if (imageView != null && drawable != null) {
+                imageView.setImageDrawable(drawable);
+            }
+        }
+    }
+
+    /**
+     * 建立http请求，获取bitmap
+     */
+    public Bitmap getImageViewInputStream(String string) {
+        InputStream inputStream = null;
+        Bitmap bitmap = null;
+        try {
+            URL url = new URL(string);
+            if (url != null) {
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setConnectTimeout(3000);
+                httpURLConnection.setRequestMethod("GET");
+                httpURLConnection.setDoInput(true);
+                int responseCode = httpURLConnection.getResponseCode();
+                Log.d("*****", "ssss" + responseCode);
+                if (responseCode == httpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                    bitmap = BitmapFactory.decodeStream(inputStream);
                 }
             }
-        }).start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bitmap;
     }
-
-
 }

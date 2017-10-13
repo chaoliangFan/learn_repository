@@ -4,10 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -42,7 +41,14 @@ public class NewsActivity extends AppCompatActivity {
                 finish();
             }
         });
-        parseJsonWithGson(getJson(fileName, NewsActivity.this));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                parseJsonWithGson(getJson(fileName, NewsActivity.this));
+
+            }
+        }).start();
         NewsAdapter adapter = new NewsAdapter(this, R.layout.news_item, newsDataList);
         newsList = (ListView) findViewById(R.id.news_show);
         newsList.setAdapter(adapter);
