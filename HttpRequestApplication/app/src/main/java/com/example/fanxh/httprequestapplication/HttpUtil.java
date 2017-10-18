@@ -2,7 +2,6 @@ package com.example.fanxh.httprequestapplication;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -36,14 +35,10 @@ public class HttpUtil {
                             String line;
                             while ((line = reader.readLine()) != null) {
                                 respone.append(line);
-                                Log.d("#########","数据请求完成");
                             }
-
                             SharedPreferences.Editor editor = MyApplication.getContext().getSharedPreferences("data", Context.MODE_PRIVATE).edit();
                             editor.putString("json",respone .toString());
                             editor.commit();
-
-
                             if (listener != null){
                                 listener.onFinish(respone.toString());
                             }

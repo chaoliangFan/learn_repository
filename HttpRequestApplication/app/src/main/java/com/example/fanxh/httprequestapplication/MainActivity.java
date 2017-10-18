@@ -6,8 +6,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
         if (actionBar != null){
             actionBar.hide();
         }
-
         SharedPreferences pref = getSharedPreferences("data",MODE_PRIVATE);
         String jsonData = pref.getString("json","");
         if (jsonData != ""){
@@ -37,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
                 public void onFinish(String response) {
                     parseJsonWithJsonObject(response);
                 }
-
                 @Override
                 public void onError(Exception e) {
                 }
