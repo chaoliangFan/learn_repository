@@ -8,8 +8,8 @@
         android:name=".MyApplication"
 
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:icon="@drawable/http_request_img_logo"
+        android:label="网络请求"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
