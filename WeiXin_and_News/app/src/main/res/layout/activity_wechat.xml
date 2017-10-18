@@ -69,6 +69,7 @@
                 android:layout_toLeftOf="@id/right_arrow"
                 android:src="@drawable/i_img_two_dimensional_code" />
         </RelativeLayout>
+
     </RelativeLayout>
 
     <RelativeLayout

@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.util.LruCache;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +53,7 @@ public class FortunetellingAdapter extends RecyclerView.Adapter <FortunetellingA
 
     public FortunetellingAdapter(List<FortunetellingBean> fortunetellingBeanList){
         mFortunetellingBeanList = fortunetellingBeanList;
+        Log.d("########","1111111111");
 
 
         int maxMemory = (int) Runtime.getRuntime().maxMemory();
@@ -86,20 +88,37 @@ public class FortunetellingAdapter extends RecyclerView.Adapter <FortunetellingA
                 MyApplication.getContext().startActivity(intent);
             }
         });
+        holder.iconUrl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = holder.getAdapterPosition();
+                FortunetellingBean fortunetellingBean = mFortunetellingBeanList.get(position);
+
+
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(fortunetellingBean.getUrl()));
+                MyApplication.getContext().startActivity(intent);
+            }
+        });
         return holder;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
     FortunetellingBean fortunetellingBean = mFortunetellingBeanList.get(position);
+        Log.d("########","22222222222");
         holder.name.setText(fortunetellingBean.getName());
         holder.iconUrl.setTag(fortunetellingBean.getIconUrl());
+        Log.d("########","33333333333");
         BitmapDrawable drawable = getBitmapFromMemoryCache(fortunetellingBean.getIconUrl());
+        Log.d("########","4444444444");
         if (drawable != null) {
             holder.iconUrl.setImageDrawable(drawable);
+            Log.d("########","555555555555");
         } else {
             BitmapWorkerTask task = new BitmapWorkerTask();
             task.execute(fortunetellingBean.getIconUrl());
+            Log.d("########","6666666666666666666");
         }
         holder.name.setText(fortunetellingBean.getName());
     }
@@ -160,13 +179,15 @@ public class FortunetellingAdapter extends RecyclerView.Adapter <FortunetellingA
             URL url = new URL(string);
             if (url != null) {
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setConnectTimeout(3000);
+                httpURLConnection.setConnectTimeout(5000);
                 httpURLConnection.setRequestMethod("GET");
                 httpURLConnection.setDoInput(true);
                 int responseCode = httpURLConnection.getResponseCode();
+                Log.d("########","HTTP_OK"+responseCode);
                 if (responseCode == httpURLConnection.HTTP_OK) {
                     inputStream = httpURLConnection.getInputStream();
                     bitmap = BitmapFactory.decodeStream(inputStream);
+                    Log.d("########","图片请求完成");
                 }
             }
         } catch (Exception e) {
