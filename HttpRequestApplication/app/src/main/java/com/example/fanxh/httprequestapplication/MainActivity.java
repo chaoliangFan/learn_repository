@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.text.TextUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         }
         SharedPreferences pref = getSharedPreferences("data",MODE_PRIVATE);
         String jsonData = pref.getString("json","");
-        if (jsonData != ""){
+        if (!TextUtils.isEmpty(jsonData)){
             parseJsonWithJsonObject(jsonData);
         }else {
             HttpUtil.sendHttpRequest(CONNECTION, new HttpCallBackListener() {
