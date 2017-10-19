@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">AppUpdate</string>
+    <string name="test">版本检测</string>
+    <string name="check">当前已是最新版本</string>
+</resources>
