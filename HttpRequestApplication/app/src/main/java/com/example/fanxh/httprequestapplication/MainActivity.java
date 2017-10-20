@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         String jsonData = pref.getString("json","");
         if (!TextUtils.isEmpty(jsonData)){
             parseJsonWithJsonObject(jsonData);
-        }else {
+        } else {
             HttpUtil.sendHttpRequest(CONNECTION, new HttpCallBackListener() {
                 @Override
                 public void onFinish(String response) {
