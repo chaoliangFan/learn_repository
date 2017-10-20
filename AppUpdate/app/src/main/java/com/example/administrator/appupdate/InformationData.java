@@ -4,7 +4,7 @@ package com.example.administrator.appupdate;
  * Created by Administrator on 2017/10/19.
  */
 
-public class InformationDate {
+public class InformationData {
     private String appkey;
     private String channel;
     private String downurl;
@@ -17,6 +17,24 @@ public class InformationDate {
     private String updatelog;
     private String updatetype;
     private String need_update;
+
+    @Override
+    public String toString() {
+        return "InformationData{" +
+                "appkey='" + appkey + '\'' +
+                ", channel='" + channel + '\'' +
+                ", downurl='" + downurl + '\'' +
+                ", packname='" + packname + '\'' +
+                ", filename='" + filename + '\'' +
+                ", filesize='" + filesize + '\'' +
+                ", md5='" + md5 + '\'' +
+                ", version='" + version + '\'' +
+                ", user_version='" + user_version + '\'' +
+                ", updatelog='" + updatelog + '\'' +
+                ", updatetype='" + updatetype + '\'' +
+                ", need_update='" + need_update + '\'' +
+                '}';
+    }
 
     public String getAppkey() {
         return appkey;

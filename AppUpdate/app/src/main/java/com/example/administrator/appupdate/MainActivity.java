@@ -1,23 +1,26 @@
 package com.example.administrator.appupdate;
 
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Button;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private final String CONNECTION = "http://update.app.2345.com/index.php";
-    //  private List<InformationDate> idList = new ArrayList<>();
-    private InformationDate informationDate;
-    private Button versionTest;
+    private final String DOWNURL = "http://download.app.2345.com/calendar2345/auto/12/my-toolsm_top.apk?12";
+    private static InformationData informationData = new InformationData();
+    private AppUpdataManger appUpdataManger;
+    private LinearLayout versionTest;
+    private TextView versionName;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,49 +30,82 @@ public class MainActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.hide();
         }
-        HttpUtil.sendHttpRequest(CONNECTION, new HttpCallBackListener() {
+        versionName = (TextView) findViewById(R.id.version_name);
+        versionName.setText(APKVersionCodeUtils.getVerName(this));
+        versionTest = (LinearLayout) findViewById(R.id.version_test);
+        versionTest.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onFinish(String response) {
-                parseJsonWithJsonObject(response);
-            }
+            public void onClick(View v) {
+                HttpUtil.sendHttpRequest(CONNECTION, new HttpCallBackListener() {
+                    @Override
+                    public void onFinish(String response) {
+                        parseJsonWithJsonObject(response);
+                    }
 
-            @Override
-            public void onError(Exception e) {
+                    @Override
+                    public void onError(Exception e) {
+                    }
+                });
+                String versionCode = String.valueOf(APKVersionCodeUtils.getVersionCode(MainActivity.this));
+                Log.d("********", "取值成功" + informationData.getVersion());
+                if (versionCode.equals(informationData.getVersion())) {
+                    Toast.makeText(MyApplication.getContext(), R.string.check, Toast.LENGTH_SHORT).show();
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(MyApplication.getContext());
+                    dialog.setTitle("当前已是最新版本");
+                    dialog.setCancelable(true);
+                    dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                    dialog.show();
+                } else {
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                    dialog.setTitle("新版本更新");
+                    dialog.setMessage(informationData.getUpdatelog());
+                    dialog.setCancelable(false);
+                    dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            appUpdataManger = new AppUpdataManger(MainActivity.this);
+                            appUpdataManger.downloadAPK(informationData.getDownurl(), "versionName");
+//                    appUpdataManger.downloadAPK(informationData.getDownurl(), informationData.getFilename());
+                        }
+                    });
+                    dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                    dialog.show();
+
+                }
+
             }
         });
-
-
-        String versionCode = String.valueOf(APKVersionCodeUtils.getVersionCode(this));
-        if (versionCode.equals(informationDate.getVersion())) {
-            Toast.makeText(this, R.string.check, Toast.LENGTH_SHORT).show();
-        } else {
-            //       ?????;
-        }
 
     }
 
 
     private void parseJsonWithJsonObject(String jsonData) {
         try {
-//            JSONArray jsonArray = new JSONArray(jsonData);
-//            for (int i = 0; i < jsonArray.length(); i++) {
-//                JSONObject jsonObject = jsonArray.getJSONObject(i);
             JSONObject jsonObject = new JSONObject(jsonData);
-            //               InformationDate informationDate = new InformationDate();
-            informationDate.setAppkey(jsonObject.getString("appkey"));
-            informationDate.setChannel(jsonObject.getString("channel"));
-            informationDate.setDownurl(jsonObject.getString("downurl"));
-            informationDate.setPackname(jsonObject.getString("packname"));
-            informationDate.setFilename(jsonObject.getString("filename"));
-            informationDate.setFilesize(jsonObject.getString("filesize"));
-            informationDate.setMd5(jsonObject.getString("md5"));
-            informationDate.setVersion(jsonObject.getString("version"));
-            informationDate.setUser_version(jsonObject.getString("user_version"));
-            informationDate.setUpdatelog(jsonObject.getString("updatelog"));
-            informationDate.setUpdatetype(jsonObject.getString("updatetype"));
-            informationDate.setNeed_update(jsonObject.getString("need_pudate"));
-            //               idList.add(informationDate);
-//            }
+            informationData.setAppkey(jsonObject.getString("appkey"));
+            informationData.setChannel(jsonObject.getString("channel"));
+            informationData.setDownurl(jsonObject.getString("downurl"));
+            informationData.setPackname(jsonObject.getString("packname"));
+            informationData.setFilename(jsonObject.getString("filename"));
+            informationData.setFilesize(jsonObject.getString("filesize"));
+            Log.d("********", "取值成功" + jsonObject.getString("filesize"));
+            informationData.setMd5(jsonObject.getString("md5"));
+            informationData.setVersion(jsonObject.getString("version"));
+            informationData.setUser_version(jsonObject.getString("user_version"));
+            informationData.setUpdatelog(jsonObject.getString("updatelog"));
+            informationData.setUpdatetype(jsonObject.getString("updatetype"));
+            informationData.setNeed_update(jsonObject.getString("need_pudate"));
+            Log.d("********", " 取值成功" + informationData.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
