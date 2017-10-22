@@ -52,9 +52,9 @@ public class AppUpdataManger {
         request.setAllowedOverRoaming(false);
         request.setVisibleInDownloadsUi(true);
         //sdcard的目录下的download文件夹，必须设置
-//        request.setDestinationInExternalPublicDir("/sdcard/download", versionName);
+       request.setDestinationInExternalPublicDir("/sdcard/download", versionName);
         //自定义路径的方法
-        request.setDestinationInExternalFilesDir(mContext, Environment.DIRECTORY_DOWNLOADS,versionName);
+    //    request.setDestinationInExternalFilesDir(mContext, Environment.DIRECTORY_DOWNLOADS,versionName);
 
         //加入下载列后会给该任务返回一个long型的id,
         //通过该id可以取消任务，重启任务等等

@@ -18,23 +18,6 @@ public class InformationData {
     private String updatetype;
     private String need_update;
 
-    @Override
-    public String toString() {
-        return "InformationData{" +
-                "appkey='" + appkey + '\'' +
-                ", channel='" + channel + '\'' +
-                ", downurl='" + downurl + '\'' +
-                ", packname='" + packname + '\'' +
-                ", filename='" + filename + '\'' +
-                ", filesize='" + filesize + '\'' +
-                ", md5='" + md5 + '\'' +
-                ", version='" + version + '\'' +
-                ", user_version='" + user_version + '\'' +
-                ", updatelog='" + updatelog + '\'' +
-                ", updatetype='" + updatetype + '\'' +
-                ", need_update='" + need_update + '\'' +
-                '}';
-    }
 
     public String getAppkey() {
         return appkey;
