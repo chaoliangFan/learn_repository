@@ -124,10 +124,6 @@ public class MainActivity extends AppCompatActivity {
                     File downLoadFile = new File(getSystemFilePath(MainActivity.this));
                     if (getDirMD5(downLoadFile, mInformationData.getMd5())) {
                         Toast.makeText(MainActivity.this, "本地存在", Toast.LENGTH_SHORT).show();
-//                        Intent install = new Intent(Intent.ACTION_VIEW);
-//                        install.setDataAndType( Uri.fromFile(downLoadFile), "application/vnd.android.package-archive");
-//                        install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                        startActivity(install);
                     } else {
                         appUpdataManger = new AppUpdataManger(MainActivity.this);
                         appUpdataManger.downloadAPK(mInformationData.getDownurl(), mInformationData.getFilename());

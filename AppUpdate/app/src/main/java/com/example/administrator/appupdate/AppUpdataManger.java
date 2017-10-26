@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
@@ -89,7 +88,7 @@ public class AppUpdataManger {
 
     public void installAPK(long appId) {
         Intent install = new Intent(Intent.ACTION_VIEW);
-         Uri downloadFileUri = downloadManager.getUriForDownloadedFile(appId);
+        Uri downloadFileUri = downloadManager.getUriForDownloadedFile(appId);
         install.setDataAndType(downloadFileUri, "application/vnd.android.package-archive");
         install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(install);
