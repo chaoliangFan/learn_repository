@@ -21,8 +21,13 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     private static final String UPDATEURL = "http://update.app.2345.com/index.php";
@@ -56,10 +61,16 @@ public class MainActivity extends AppCompatActivity {
                 if (networkInfo == null || !networkInfo.isAvailable()) {
                     Toast.makeText(MainActivity.this, "当前无网络，请先检查网络", Toast.LENGTH_SHORT).show();
                 } else {
-                    HttpUtil.sendHttpRequest(UPDATEURL, new HttpCallBackListener() {
+                    HttpUtil.sendHttpRequest(UPDATEURL, new Callback() {
                         @Override
-                        public void onFinish(String response) {
-                            parseJsonWithJsonObject(response);
+                        public void onFailure(Call call, IOException e) {
+                            Toast.makeText(MainActivity.this, "检测失败", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            String responseData = response.body().string();
+                            parseJsonWithJsonObject(responseData);
                             if (!TextUtils.isEmpty(mInformationData.getNeed_update())) {
                                 Message message = new Message();
                                 message.what = 1;
@@ -69,11 +80,6 @@ public class MainActivity extends AppCompatActivity {
                                 message.what = 2;
                                 receiveMessage.sendMessage(message);
                             }
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-                            Toast.makeText(MainActivity.this, "服务器无响应", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
