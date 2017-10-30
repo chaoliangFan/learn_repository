@@ -1,13 +1,18 @@
 package com.example.administrator.appupdate;
 
+import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -31,8 +36,8 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     private static final String UPDATEURL = "http://update.app.2345.com/index.php";
-    private InformationData mInformationData;
     private AppUpdataManger appUpdataManger = new AppUpdataManger(MainActivity.this);
+    private InformationData mInformationData;
     private LinearLayout mVersionTest;
     private TextView mShowVersionName;
     private Handler receiveMessage = new Handler() {
@@ -40,39 +45,6 @@ public class MainActivity extends AppCompatActivity {
             mShowDialog(msg.what);
         }
     };
-
-    public static String getFileMD5(File file) {
-        if (!file.isFile()) {
-            return null;
-        }
-        MessageDigest digest = null;
-        FileInputStream in = null;
-        byte buffer[] = new byte[1024];
-        int len;
-        try {
-            digest = MessageDigest.getInstance("MD5");
-            in = new FileInputStream(file);
-            while ((len = in.read(buffer, 0, 1024)) != -1) {
-                digest.update(buffer, 0, len);
-            }
-            in.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        BigInteger bigInt = new BigInteger(1, digest.digest());
-        return bigInt.toString(16);
-    }
-
-    private static String getSystemFilePath(Context context) {
-        String cachePath;
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || !Environment.isExternalStorageRemovable()) {
-            cachePath = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
-        } else {
-            cachePath = context.getFilesDir().getAbsolutePath();
-        }
-        return cachePath;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
                         installDialog.show();
 
                     } else {
+                        appUpdataManger = new AppUpdataManger(MainActivity.this);
                         appUpdataManger.downloadAPK(mInformationData.getDownurl(), mInformationData.getFilename());
                     }
                 }
@@ -190,6 +163,29 @@ public class MainActivity extends AppCompatActivity {
             });
             dialog.show();
         }
+    }
+
+    public static String getFileMD5(File file) {
+        if (!file.isFile()) {
+            return null;
+        }
+        MessageDigest digest = null;
+        FileInputStream in = null;
+        byte buffer[] = new byte[1024];
+        int len;
+        try {
+            digest = MessageDigest.getInstance("MD5");
+            in = new FileInputStream(file);
+            while ((len = in.read(buffer, 0, 1024)) != -1) {
+                digest.update(buffer, 0, len);
+            }
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        BigInteger bigInt = new BigInteger(1, digest.digest());
+        return bigInt.toString(16);
     }
 
     /**
@@ -218,5 +214,16 @@ public class MainActivity extends AppCompatActivity {
         }
         return isSameFile;
     }
+
+    private static String getSystemFilePath(Context context) {
+        String cachePath;
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || !Environment.isExternalStorageRemovable()) {
+            cachePath = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+        } else {
+            cachePath = context.getFilesDir().getAbsolutePath();
+        }
+        return cachePath;
+    }
+
 }
 
