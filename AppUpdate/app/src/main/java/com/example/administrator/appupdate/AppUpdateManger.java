@@ -22,14 +22,14 @@ import java.io.File;
  * Created by fanxh on 2017/10/20.
  */
 
-public class AppUpdataManger {
+public class AppUpdateManger {
     private static DownloadManager downloadManager;
     private Context mContext;
     public static long mTaskId;
     private String versionName;
     private ProgressDialog progressDidog;
 
-    public AppUpdataManger(Context context) {
+    public AppUpdateManger(Context context) {
         this.mContext = context;
     }
 

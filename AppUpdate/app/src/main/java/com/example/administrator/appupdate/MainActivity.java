@@ -1,18 +1,13 @@
 package com.example.administrator.appupdate;
 
-import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -36,7 +31,7 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     private static final String UPDATEURL = "http://update.app.2345.com/index.php";
-    private AppUpdataManger appUpdataManger = new AppUpdataManger(MainActivity.this);
+    private AppUpdateManger appUpdataManger = new AppUpdateManger(MainActivity.this);
     private InformationData mInformationData;
     private LinearLayout mVersionTest;
     private TextView mShowVersionName;
@@ -151,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                         installDialog.show();
 
                     } else {
-                        appUpdataManger = new AppUpdataManger(MainActivity.this);
+                        appUpdataManger = new AppUpdateManger(MainActivity.this);
                         appUpdataManger.downloadAPK(mInformationData.getDownurl(), mInformationData.getFilename());
                     }
                 }
