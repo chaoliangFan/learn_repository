@@ -1,9 +1,9 @@
 package com.example.fanxh.simpleweather;
 
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
 import android.os.Bundle;
 
-public class ChooseArea extends AppCompatActivity {
+public class ChangeArea extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

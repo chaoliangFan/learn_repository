@@ -74,7 +74,7 @@ public class ChooseAreaFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.choose_area, container, false);
+        View view = inflater.inflate(R.layout.choose_area_fragment, container, false);
         mTitleText = (TextView) view.findViewById(R.id.title_text);
         mBackButton = (Button) view.findViewById(R.id.back_button);
         mShowArea = (ListView) view.findViewById(R.id.list_view);
@@ -95,20 +95,19 @@ public class ChooseAreaFragment extends Fragment {
                 } else if (currentLevel == LEVEL_CITY) {
                     selectedCity = cityList.get(position);
                     queryCounties();
-                }else if (currentLevel == LEVEL_COUNTY){
+                } else if (currentLevel == LEVEL_COUNTY) {
                     selectedCounty = countyList.get(position);
-                    TextView mShowArea = (TextView)getActivity().findViewById(R.id.show_area);
-                    mShowArea.setText(selectedCounty.getCountyName());
-                    Intent intent = new Intent(getActivity(),MainActivity.class);
-                    startActivity(intent);
+                    String weatherId = selectedCounty.getWeatherId();
+                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                    intent.putExtra("weather_id", weatherId);
+                    getActivity().startActivity(intent);
+                    getActivity().finish();
                 }
 
 
                 /**
                  * 获取查看的天气的地区
                  */
-
-
 
 
             }

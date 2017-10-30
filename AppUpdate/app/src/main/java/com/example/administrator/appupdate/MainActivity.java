@@ -32,8 +32,7 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
     private static final String UPDATEURL = "http://update.app.2345.com/index.php";
     private InformationData mInformationData;
-    ;
-    private AppUpdataManger appUpdataManger;
+    private AppUpdataManger appUpdataManger = new AppUpdataManger(MainActivity.this);
     private LinearLayout mVersionTest;
     private TextView mShowVersionName;
     private Handler receiveMessage = new Handler() {
@@ -41,6 +40,39 @@ public class MainActivity extends AppCompatActivity {
             mShowDialog(msg.what);
         }
     };
+
+    public static String getFileMD5(File file) {
+        if (!file.isFile()) {
+            return null;
+        }
+        MessageDigest digest = null;
+        FileInputStream in = null;
+        byte buffer[] = new byte[1024];
+        int len;
+        try {
+            digest = MessageDigest.getInstance("MD5");
+            in = new FileInputStream(file);
+            while ((len = in.read(buffer, 0, 1024)) != -1) {
+                digest.update(buffer, 0, len);
+            }
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        BigInteger bigInt = new BigInteger(1, digest.digest());
+        return bigInt.toString(16);
+    }
+
+    private static String getSystemFilePath(Context context) {
+        String cachePath;
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || !Environment.isExternalStorageRemovable()) {
+            cachePath = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+        } else {
+            cachePath = context.getFilesDir().getAbsolutePath();
+        }
+        return cachePath;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +101,8 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         public void onResponse(Call call, Response response) throws IOException {
-                            String responseData = response.body().string();
-                            parseJsonWithJsonObject(responseData);
+                            String responseDate = response.body().string();
+                            parseJsonWithJsonObject(responseDate);
                             if (!TextUtils.isEmpty(mInformationData.getNeed_update())) {
                                 Message message = new Message();
                                 message.what = 1;
@@ -127,11 +159,26 @@ public class MainActivity extends AppCompatActivity {
             dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    File downLoadFile = new File(getSystemFilePath(MainActivity.this));
+                    final File downLoadFile = new File(getSystemFilePath(MainActivity.this));
                     if (getDirMD5(downLoadFile, mInformationData.getMd5())) {
-                        Toast.makeText(MainActivity.this, "本地存在", Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder installDialog = new AlertDialog.Builder(MainActivity.this);
+                        installDialog.setTitle("本地已存在安装包");
+                        installDialog.setMessage("是否立即安装");
+                        installDialog.setCancelable(true);
+                        installDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                appUpdataManger.installAPK(appUpdataManger.mTaskId);
+                            }
+                        });
+                        installDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+                        installDialog.show();
+
                     } else {
-                        appUpdataManger = new AppUpdataManger(MainActivity.this);
                         appUpdataManger.downloadAPK(mInformationData.getDownurl(), mInformationData.getFilename());
                     }
                 }
@@ -143,29 +190,6 @@ public class MainActivity extends AppCompatActivity {
             });
             dialog.show();
         }
-    }
-
-    public static String getFileMD5(File file) {
-        if (!file.isFile()) {
-            return null;
-        }
-        MessageDigest digest = null;
-        FileInputStream in = null;
-        byte buffer[] = new byte[1024];
-        int len;
-        try {
-            digest = MessageDigest.getInstance("MD5");
-            in = new FileInputStream(file);
-            while ((len = in.read(buffer, 0, 1024)) != -1) {
-                digest.update(buffer, 0, len);
-            }
-            in.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        BigInteger bigInt = new BigInteger(1, digest.digest());
-        return bigInt.toString(16);
     }
 
     /**
@@ -193,16 +217,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return isSameFile;
-    }
-
-    private static String getSystemFilePath(Context context) {
-        String cachePath;
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || !Environment.isExternalStorageRemovable()) {
-            cachePath = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
-        } else {
-            cachePath = context.getFilesDir().getAbsolutePath();
-        }
-        return cachePath;
     }
 }
 

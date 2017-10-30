@@ -6,6 +6,8 @@ import android.text.TextUtils;
 import com.example.fanxh.simpleweather.db.City;
 import com.example.fanxh.simpleweather.db.County;
 import com.example.fanxh.simpleweather.db.Province;
+import com.example.fanxh.simpleweather.gson.Weather;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,6 +18,7 @@ import org.json.JSONObject;
  */
 
 public class Utility {
+    public static Weather weather;
     /**
      *解析和处理服务器返回的省级数据
      */
@@ -82,5 +85,22 @@ public class Utility {
             }
         }
         return  false;
+    }
+
+
+
+    public static Weather handleWeatherResponse(String response) {
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather5");
+
+            String weatherInformation = jsonArray.getJSONObject(0).toString();
+         return (new Gson().fromJson(weatherInformation, Weather.class));
+//            weather = new Gson().fromJson(weatherInformation, Weather.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+//        return weather;
     }
 }

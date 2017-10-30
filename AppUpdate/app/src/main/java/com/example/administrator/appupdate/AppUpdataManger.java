@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
@@ -18,26 +19,25 @@ import android.widget.Toast;
  */
 
 public class AppUpdataManger {
+    public static long mTaskId;
     private static DownloadManager downloadManager;
     private Context mContext;
-    public static long mTaskId;
     private String versionName;
-
-    public AppUpdataManger(Context context) {
-        this.mContext = context;
-    }
-
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+
             checkDownloadStatus();
             mContext.unregisterReceiver(receiver);
         }
     };
 
+    public AppUpdataManger(Context context) {
+        this.mContext = context;
+    }
+
     public void downloadAPK(String versionUrl, String versionName) {
         this.versionName = versionName;
-        downloadManager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(versionUrl));
         request.setAllowedOverRoaming(false);
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
@@ -47,6 +47,7 @@ public class AppUpdataManger {
         request.setAllowedOverRoaming(false);
         request.setVisibleInDownloadsUi(true);
         request.setDestinationInExternalFilesDir(mContext, Environment.DIRECTORY_DOWNLOADS, versionName);
+        downloadManager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
         mTaskId = downloadManager.enqueue(request);
         mContext.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
@@ -59,6 +60,7 @@ public class AppUpdataManger {
             int status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
             switch (status) {
                 case DownloadManager.STATUS_SUCCESSFUL:
+
                     AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
                     dialog.setTitle("下载完成");
                     dialog.setMessage("是否立即安装");
@@ -88,9 +90,12 @@ public class AppUpdataManger {
 
     public void installAPK(long appId) {
         Intent install = new Intent(Intent.ACTION_VIEW);
+        System.out.println("test:");
         Uri downloadFileUri = downloadManager.getUriForDownloadedFile(appId);
+        Log.d("*****", "downloadFileUri----" + downloadFileUri);
         install.setDataAndType(downloadFileUri, "application/vnd.android.package-archive");
         install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(install);
+        Log.d("*****", "downloadFileUri----" + downloadFileUri);
     }
 }
