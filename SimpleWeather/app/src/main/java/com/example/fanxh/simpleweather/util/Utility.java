@@ -1,6 +1,10 @@
 package com.example.fanxh.simpleweather.util;
 
+import android.annotation.TargetApi;
 import android.graphics.Paint;
+import android.icu.text.SimpleDateFormat;
+import android.icu.util.Calendar;
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.example.fanxh.simpleweather.db.City;
@@ -102,5 +106,42 @@ public class Utility {
         }
         return null;
 //        return weather;
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    public static String getWeek(String pTime) {
+
+        String Week = "";
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar c = Calendar.getInstance();
+        try {
+            c.setTime(format.parse(pTime));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (c.get(Calendar.DAY_OF_WEEK) == 1) {
+            Week += "日";
+        }
+        if (c.get(Calendar.DAY_OF_WEEK) == 2) {
+            Week += "一";
+        }
+        if (c.get(Calendar.DAY_OF_WEEK) == 3) {
+            Week += "二";
+        }
+        if (c.get(Calendar.DAY_OF_WEEK) == 4) {
+            Week += "三";
+        }
+        if (c.get(Calendar.DAY_OF_WEEK) == 5) {
+            Week += "四";
+        }
+        if (c.get(Calendar.DAY_OF_WEEK) == 6) {
+            Week += "五";
+        }
+        if (c.get(Calendar.DAY_OF_WEEK) == 7) {
+            Week += "六";
+        }
+
+        return Week;
     }
 }

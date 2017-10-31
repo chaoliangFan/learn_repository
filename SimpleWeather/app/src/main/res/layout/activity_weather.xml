@@ -20,14 +20,14 @@
 
             <include layout="@layout/title" />
 
-            <include layout="@layout/now" />
-
-            <include layout="@layout/aqi" />
-
+            <include layout="@layout/hourly_forecast"/>
 
             <include layout="@layout/daily_forecast" />
 
-            <include layout="@layout/suggestion" />
+            <include layout="@layout/describe"/>
+
+            <include layout="@layout/more_information"/>
+
         </LinearLayout>
 
     </ScrollView>

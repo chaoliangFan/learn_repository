@@ -13,4 +13,5 @@ public class Weather {
     public Now now;
     public Suggestion suggestion;
     public List<Daily_forecast> daily_forecast;
+    public List<Hourly_forecast> hourly_forecast;
 }

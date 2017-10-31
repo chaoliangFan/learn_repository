@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/sunrise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="200dp"
+            android:layout_marginTop="5dp"
+            android:text="日出:"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/sunris_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="190dp"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/sunset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/sunrise"
+            android:layout_below="@+id/sunrise"
+            android:text="日落:"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/sunset_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/sunris_value"
+            android:layout_below="@+id/sunris_value"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/rainfall_probability"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="200dp"
+            android:layout_marginTop="5dp"
+            android:text="降雨概率:"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/rainfall_probability_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="190dp"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/humidity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/rainfall_probability"
+            android:layout_below="@+id/rainfall_probability"
+            android:text="湿度:"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/humidity_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/rainfall_probability_value"
+            android:layout_below="@+id/rainfall_probability_value"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/air_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="200dp"
+            android:layout_marginTop="5dp"
+            android:text="风速:"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/air_speed_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="190dp"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/sendible_temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/air_speed"
+            android:layout_below="@+id/air_speed"
+            android:text="体感温度:"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/sendible_temperature_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/air_speed_value"
+            android:layout_below="@+id/air_speed_value"
+            android:text="18°"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/precipitation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="200dp"
+            android:layout_marginTop="5dp"
+            android:text="降水量:"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/precipitation_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="190dp"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/air_pressure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/precipitation"
+            android:layout_below="@+id/precipitation"
+            android:text="气压:"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/air_pressure_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/precipitation_value"
+            android:layout_below="@+id/precipitation_value"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/visibility"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="200dp"
+            android:layout_marginTop="5dp"
+            android:text="能见度:"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/visibility_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="190dp"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/ultraviolet_index"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/visibility"
+            android:layout_below="@+id/visibility"
+            android:text="紫外线指数:"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/ultraviolet_index_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/visibility_value"
+            android:layout_below="@+id/visibility_value"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/aqi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="200dp"
+            android:layout_marginTop="5dp"
+            android:text="空气质量指数:"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/aqi_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="190dp"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/air_quality"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/aqi"
+            android:layout_below="@+id/aqi"
+            android:text="空气质量:"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/air_quality_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/aqi_value"
+            android:layout_below="@+id/aqi_value"
+            android:textColor="@color/mainColor"
+            android:textSize="15dp" />
+    </RelativeLayout>
+
+</LinearLayout>
