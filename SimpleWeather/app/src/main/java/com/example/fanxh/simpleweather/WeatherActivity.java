@@ -28,7 +28,6 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class WeatherActivity extends AppCompatActivity {
-
     private TextView mTitleCity;
     private TextView mTitleNowCond;
     private TextView mTitleNowDegree;
@@ -36,7 +35,6 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView mTitleDegree;
     private RecyclerView mHourlyItem;
     private TextView mWeatherDescribe;
-
     private TextView mSunriseValue;
     private TextView mSunsetValue;
     private TextView mRainfallProbabilityValue;
@@ -49,10 +47,7 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView mUltravioletIndexValue;
     private TextView mAQIValue;
     private TextView mAirQualityValue;
-
     private LinearLayout mDailyForecast;
-
-
     private ImageView mWebLeft;
     private ImageView mChooseAreaRight;
 
@@ -69,27 +64,24 @@ public class WeatherActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse("http://tools.2345.com/m/rili.htm"));
                 startActivity(intent);
+                finish();
             }
         });
         mChooseAreaRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent  = new Intent(WeatherActivity.this,SearchAreaActivity.class);
+                Intent intent = new Intent(WeatherActivity.this, SearchAreaActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
-
-
         mTitleCity = (TextView) findViewById(R.id.title_city);
         mTitleDate = (TextView) findViewById(R.id.title_date);
         mTitleDegree = (TextView) findViewById(R.id.title_degree);
         mTitleNowCond = (TextView) findViewById(R.id.title_now_cond);
         mTitleNowDegree = (TextView) findViewById(R.id.title_now_degree);
-
         mHourlyItem = (RecyclerView) findViewById(R.id.hourly_item);
-
         mWeatherDescribe = (TextView) findViewById(R.id.weather_describe);
-
         mSunriseValue = (TextView) findViewById(R.id.sunris_value);
         mSunsetValue = (TextView) findViewById(R.id.sunset_value);
         mRainfallProbabilityValue = (TextView) findViewById(R.id.rainfall_probability_value);
@@ -157,24 +149,16 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     public void showWeatherInformation(Weather weather) {
-
         mTitleCity.setText(weather.basic.city);
-
         mTitleNowCond.setText(weather.now.cond.txt);
         mTitleNowDegree.setText(weather.now.tmp + "°");
-
         mTitleDate.setText("星期" + Utility.getWeek(weather.daily_forecast.get(0).date) + "  今天");
         mTitleDegree.setText(weather.daily_forecast.get(0).tmp.max + "  " + weather.daily_forecast.get(0).tmp.min);
-
-
-
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mHourlyItem.setLayoutManager(layoutManager);
         HourlyForecastAdapter mHourlyForecastAdapter = new HourlyForecastAdapter(weather.hourly_forecast);
         mHourlyItem.setAdapter(mHourlyForecastAdapter);
-
         mDailyForecast.removeAllViews();
         for (int i = 0; i < 3; i++) {
             for (Daily_forecast mDaily_forecast : weather.daily_forecast) {
@@ -220,11 +204,9 @@ public class WeatherActivity extends AppCompatActivity {
             }
 
         }
-
         mWeatherDescribe.setText("今天: 当前" + weather.now.cond.txt + "。 最高气温" + weather.daily_forecast.get(0).tmp.max + "°。 今晚" + weather.daily_forecast.get(0).cond.txt_n + "， 最低气温" + weather.daily_forecast.get(0).tmp.min + "。");
-
-        if (Time(weather.daily_forecast.get(0).astro.sr) < 12){
-            mSunriseValue.setText("上午"+weather.daily_forecast.get(0).astro.sr.substring(1, 5));
+        if (Time(weather.daily_forecast.get(0).astro.sr) < 12) {
+            mSunriseValue.setText("上午" + weather.daily_forecast.get(0).astro.sr.substring(1, 5));
         }
         if (Time(weather.daily_forecast.get(0).astro.ss) > 12) {
             mSunsetValue.setText("下午" + Integer.toString(Time(weather.daily_forecast.get(0).astro.ss) - 12) + weather.daily_forecast.get(0).astro.ss.substring(2, 5));
@@ -241,7 +223,7 @@ public class WeatherActivity extends AppCompatActivity {
         try {
             mAQIValue.setText(weather.aqi.city.aqi);
             mAirQualityValue.setText(weather.aqi.city.qlty);
-        }catch(Exception e){
+        } catch (Exception e) {
             mAQIValue.setText("无");
             mAirQualityValue.setText("无");
         }

@@ -22,7 +22,7 @@
         android:layout_marginTop="5dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginLeft="5dp"
-        android:src="@drawable/i_sun01"/>
+        android:src="@drawable/i_sun"/>
     <TextView
         android:id="@+id/degree"
         android:layout_width="wrap_content"

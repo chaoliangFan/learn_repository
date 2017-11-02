@@ -91,28 +91,21 @@ public class Utility {
         return  false;
     }
 
-
-
     public static Weather handleWeatherResponse(String response) {
         try {
             JSONObject jsonObject = new JSONObject(response);
             JSONArray jsonArray = jsonObject.getJSONArray("HeWeather5");
-
             String weatherInformation = jsonArray.getJSONObject(0).toString();
          return (new Gson().fromJson(weatherInformation, Weather.class));
-//            weather = new Gson().fromJson(weatherInformation, Weather.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
-//        return weather;
     }
 
     @TargetApi(Build.VERSION_CODES.N)
     public static String getWeek(String pTime) {
-
         String Week = "";
-
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Calendar c = Calendar.getInstance();
         try {
@@ -141,7 +134,6 @@ public class Utility {
         if (c.get(Calendar.DAY_OF_WEEK) == 7) {
             Week += "六";
         }
-
         return Week;
     }
 }

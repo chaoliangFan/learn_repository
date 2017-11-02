@@ -1,22 +1,23 @@
 package com.example.fanxh.simpleweather;
 
+import org.litepal.crud.DataSupport;
+
 /**
  * Created by fanxh on 2017/11/2.
  */
 
-public class InformationBean {
-    private String systemTime;
+public class InformationBean extends DataSupport{
     private String city;
     private String degrees;
+    private String status;
 
-    public String getSystemTime() {
-        return systemTime;
+    public String getStatus() {
+        return status;
     }
 
-    public void setSystemTime(String systemTime) {
-        this.systemTime = systemTime;
+    public void setStatus(String status) {
+        this.status = status;
     }
-
     public String getCity() {
         return city;
     }
