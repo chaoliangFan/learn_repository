@@ -1,34 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/show_weather"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/show_weather"
-    android:background="@drawable/i_weather_bg">
+    android:background="@drawable/i_weather_bg"
+    android:orientation="vertical">
 
-    <ScrollView
-        android:id="@+id/weather_layout"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:overScrollMode="never"
-        android:scrollbars="none">
+        android:layout_weight="1.0"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <include layout="@layout/title" />
+
+        <ScrollView
+            android:id="@+id/weather_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:overScrollMode="never"
+            android:scrollbars="none">
 
-            <include layout="@layout/title" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-            <include layout="@layout/hourly_forecast"/>
+                <include layout="@layout/now"/>
 
-            <include layout="@layout/daily_forecast" />
+                <include layout="@layout/hourly_forecast" />
 
-            <include layout="@layout/describe"/>
+                <include layout="@layout/daily_forecast" />
 
-            <include layout="@layout/more_information"/>
+                <include layout="@layout/describe" />
 
-        </LinearLayout>
+                <include layout="@layout/more_information" />
 
-    </ScrollView>
+            </LinearLayout>
+
+        </ScrollView>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#fff" />
+
+        <ImageView
+            android:id="@+id/web_left"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="15dp"
+            android:src="@drawable/ic_official_website" />
+
+        <ImageView
+            android:id="@+id/choose_area_right"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="15dp"
+            android:src="@drawable/ic_change_area" />
+    </RelativeLayout>
 </LinearLayout>

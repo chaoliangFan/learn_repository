@@ -274,5 +274,4 @@
             android:textColor="@color/mainColor"
             android:textSize="15dp" />
     </RelativeLayout>
-
 </LinearLayout>

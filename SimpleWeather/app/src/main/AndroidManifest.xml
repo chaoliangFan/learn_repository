@@ -20,7 +20,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".WeatherActivity" />
-        <activity android:name=".ChangeArea"></activity>
+        <activity android:name=".ChangeArea" />
+        <activity android:name=".SearchAreaActivity"></activity>
     </application>
 
 </manifest>

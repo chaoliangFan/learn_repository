@@ -2,6 +2,7 @@ package com.example.fanxh.simpleweather;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -10,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -28,8 +28,6 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class WeatherActivity extends AppCompatActivity {
-
-    private Button mChooseArea;
 
     private TextView mTitleCity;
     private TextView mTitleNowCond;
@@ -54,19 +52,33 @@ public class WeatherActivity extends AppCompatActivity {
 
     private LinearLayout mDailyForecast;
 
+
+    private ImageView mWebLeft;
+    private ImageView mChooseAreaRight;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
 
-        mChooseArea = (Button) findViewById(R.id.choose_area);
-        mChooseArea.setOnClickListener(new View.OnClickListener() {
+        mWebLeft = (ImageView) findViewById(R.id.web_left);
+        mChooseAreaRight = (ImageView) findViewById(R.id.choose_area_right);
+        mWebLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(WeatherActivity.this, ChangeArea.class);
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("http://tools.2345.com/m/rili.htm"));
                 startActivity(intent);
             }
         });
+        mChooseAreaRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent  = new Intent(WeatherActivity.this,SearchAreaActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
         mTitleCity = (TextView) findViewById(R.id.title_city);
         mTitleDate = (TextView) findViewById(R.id.title_date);
@@ -154,6 +166,9 @@ public class WeatherActivity extends AppCompatActivity {
         mTitleDate.setText("星期" + Utility.getWeek(weather.daily_forecast.get(0).date) + "  今天");
         mTitleDegree.setText(weather.daily_forecast.get(0).tmp.max + "  " + weather.daily_forecast.get(0).tmp.min);
 
+
+
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mHourlyItem.setLayoutManager(layoutManager);
@@ -202,14 +217,15 @@ public class WeatherActivity extends AppCompatActivity {
                 }
                 mDailyDegree.setText(mDailyTmpMax + "  " + mDaily_forecast.tmp.min);
                 mDailyForecast.addView(view);
-
             }
 
         }
 
-        mWeatherDescribe.setText("今天: 现在" + weather.now.cond.txt + "。 最高气温" + weather.daily_forecast.get(0).tmp.max + "°。 今晚" + weather.daily_forecast.get(0).cond.txt_n + "， 最低气温" + weather.daily_forecast.get(0).tmp.min + "。");
+        mWeatherDescribe.setText("今天: 当前" + weather.now.cond.txt + "。 最高气温" + weather.daily_forecast.get(0).tmp.max + "°。 今晚" + weather.daily_forecast.get(0).cond.txt_n + "， 最低气温" + weather.daily_forecast.get(0).tmp.min + "。");
 
-        mSunriseValue.setText("上午" + weather.daily_forecast.get(0).astro.sr);
+        if (Time(weather.daily_forecast.get(0).astro.sr) < 12){
+            mSunriseValue.setText("上午"+weather.daily_forecast.get(0).astro.sr.substring(1, 5));
+        }
         if (Time(weather.daily_forecast.get(0).astro.ss) > 12) {
             mSunsetValue.setText("下午" + Integer.toString(Time(weather.daily_forecast.get(0).astro.ss) - 12) + weather.daily_forecast.get(0).astro.ss.substring(2, 5));
         }
@@ -222,8 +238,13 @@ public class WeatherActivity extends AppCompatActivity {
         mAirPressureValue.setText(weather.daily_forecast.get(0).pres + "百帕");
         mVisibilityValue.setText(weather.daily_forecast.get(0).vis + "公里");
         mUltravioletIndexValue.setText(weather.daily_forecast.get(0).uv);
-        mAQIValue.setText(weather.aqi.city.aqi);
-        mAirQualityValue.setText(weather.aqi.city.qlty);
+        try {
+            mAQIValue.setText(weather.aqi.city.aqi);
+            mAirQualityValue.setText(weather.aqi.city.qlty);
+        }catch(Exception e){
+            mAQIValue.setText("无");
+            mAirQualityValue.setText("无");
+        }
     }
 
     public int Time(String string) {

@@ -43,8 +43,9 @@ public class HourlyForecastAdapter extends RecyclerView.Adapter<HourlyForecastAd
     public void onBindViewHolder(HourlyForecastAdapter.ViewHolder holder, int position) {
         Hourly_forecast mHourly_forecast = mHourly_forecastList.get(position);
 
- //       holder.mTime.setText(mHourly_forecast.date);
-        if (Time(mHourly_forecast.date)<10){
+        if (position == 0){
+            holder.mTime.setText("现在");
+        }else if (Time(mHourly_forecast.date)<10){
             holder.mTime.setText("上午"+ mHourly_forecast.date.substring(12, 13) + "时");
         }else if (10 <= Time(mHourly_forecast.date) && Time(mHourly_forecast.date) < 12) {
             holder.mTime.setText("上午"+ mHourly_forecast.date.substring(11, 13) + "时");
