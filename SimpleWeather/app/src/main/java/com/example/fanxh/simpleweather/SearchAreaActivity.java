@@ -59,7 +59,7 @@ public class SearchAreaActivity extends AppCompatActivity {
             requestWeather(weatherId);
         } else {
             final List<InformationBean> informationBeans = DataSupport.findAll(InformationBean.class);
-            mInformationBeanList.addAll(informationBeans);
+//            mInformationBeanList.addAll(informationBeans);
             SearchAreaAdapter mSearchAreaAdapter = new SearchAreaAdapter(SearchAreaActivity.this, R.layout.search_area_item, informationBeans);
             ListView mSearchArea = (ListView) findViewById(R.id.search_area);
             mSearchArea.setAdapter(mSearchAreaAdapter);
@@ -87,20 +87,22 @@ public class SearchAreaActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        DataSupport.deleteAll(InformationBean.class,"city = ?",weather.basic.city);
                         if (weather != null && "ok".equals(weather.status)) {
                             mInformationBean = new InformationBean();
                             mInformationBean.setCity(weather.basic.city);
                             mInformationBean.setDegrees(weather.now.tmp);
                             mInformationBean.setStatus(weather.now.cond.txt);
                             mInformationBean.save();
+                            final List<InformationBean> informationBeans = DataSupport.findAll(InformationBean.class);
                             mInformationBeanList.add(mInformationBean);
-                            SearchAreaAdapter mSearchAreaAdapter = new SearchAreaAdapter(SearchAreaActivity.this, R.layout.search_area_item, mInformationBeanList);
+                            SearchAreaAdapter mSearchAreaAdapter = new SearchAreaAdapter(SearchAreaActivity.this, R.layout.search_area_item, informationBeans);
                             ListView mSearchArea = (ListView) findViewById(R.id.search_area);
                             mSearchArea.setAdapter(mSearchAreaAdapter);
                             mSearchArea.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                    InformationBean mIBean = mInformationBeanList.get(position);
+                                    InformationBean mIBean = informationBeans.get(position);
                                     Intent intent = new Intent(SearchAreaActivity.this, WeatherActivity.class);
                                     intent.putExtra("weather_id", mIBean.getCity());
                                     startActivity(intent);
