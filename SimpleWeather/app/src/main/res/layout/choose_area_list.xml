@@ -4,10 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-    <ListView
+    <LinearLayout
+        android:id="@+id/search_area_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    </LinearLayout>
+ <!--   <ListView
         android:id="@+id/search_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-    </ListView>
+    </ListView>-->
 
 </LinearLayout>

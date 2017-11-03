@@ -2,8 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/ic_search_area_activity_bg"
     android:orientation="vertical">
-<!--    <ScrollView
+    <ScrollView
         android:id="@+id/weather_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,9 +22,9 @@
 
         </LinearLayout>
 
-    </ScrollView>-->
+    </ScrollView>
 
-    <ListView
+<!--    <ListView
         android:id="@+id/search_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"></ListView>
@@ -58,7 +59,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="30dp"
             android:src="@drawable/ic_official_website"/>
-    </RelativeLayout>
+    </RelativeLayout>-->
     <!--<ImageView-->
         <!--android:id="@+id/official_website"-->
         <!--android:layout_width="30dp"-->

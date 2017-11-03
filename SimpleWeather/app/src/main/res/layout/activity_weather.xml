@@ -42,10 +42,13 @@
         </ScrollView>
     </LinearLayout>
 
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp">
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -57,8 +60,8 @@
             android:layout_height="30dp"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:layout_marginTop="10dp"
             android:layout_marginLeft="15dp"
+            android:layout_marginTop="10dp"
             android:src="@drawable/ic_official_website" />
 
         <ImageView
@@ -67,8 +70,8 @@
             android:layout_height="30dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginTop="10dp"
             android:layout_marginRight="15dp"
+            android:layout_marginTop="10dp"
             android:src="@drawable/ic_change_area" />
     </RelativeLayout>
 </LinearLayout>
