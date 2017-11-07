@@ -16,7 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.fanxh.simpleweather.gson.Daily_forecast;
+import com.example.fanxh.simpleweather.gson.DailyForecast;
 import com.example.fanxh.simpleweather.gson.Weather;
 import com.example.fanxh.simpleweather.util.HttpUtil;
 import com.example.fanxh.simpleweather.util.Utility;
@@ -64,7 +64,7 @@ public class WeatherActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse("http://tools.2345.com/m/rili.htm"));
                 startActivity(intent);
-                finish();
+//                finish();
             }
         });
         mChooseAreaRight.setOnClickListener(new View.OnClickListener() {
@@ -161,7 +161,7 @@ public class WeatherActivity extends AppCompatActivity {
         mHourlyItem.setAdapter(mHourlyForecastAdapter);
         mDailyForecast.removeAllViews();
         for (int i = 0; i < 3; i++) {
-            for (Daily_forecast mDaily_forecast : weather.daily_forecast) {
+            for (DailyForecast mDaily_forecast : weather.daily_forecast) {
                 View view = LayoutInflater.from(this).inflate(R.layout.daily_forecast_item, mDailyForecast, false);
                 TextView mDailyDate = (TextView) view.findViewById(R.id.daily_date);
                 ImageView mDailyStatus = (ImageView) view.findViewById(R.id.daily_status);

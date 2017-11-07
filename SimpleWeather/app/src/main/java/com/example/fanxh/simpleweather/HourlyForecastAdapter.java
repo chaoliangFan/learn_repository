@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.fanxh.simpleweather.gson.Hourly_forecast;
+import com.example.fanxh.simpleweather.gson.HourlyForecast;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import java.util.List;
 
 public class HourlyForecastAdapter extends RecyclerView.Adapter<HourlyForecastAdapter.ViewHolder> {
 
-    private List<Hourly_forecast> mHourly_forecastList;
+    private List<HourlyForecast> mHourly_forecastList;
     static class ViewHolder extends RecyclerView.ViewHolder{
         TextView mTime;
         ImageView mStatus;
@@ -29,7 +29,7 @@ public class HourlyForecastAdapter extends RecyclerView.Adapter<HourlyForecastAd
             mDegree = (TextView)view.findViewById(R.id.degree);
         }
     }
-    public HourlyForecastAdapter(List<Hourly_forecast> hourly_forecastList){
+    public HourlyForecastAdapter(List<HourlyForecast> hourly_forecastList){
         mHourly_forecastList = hourly_forecastList;
     }
 
@@ -41,7 +41,7 @@ public class HourlyForecastAdapter extends RecyclerView.Adapter<HourlyForecastAd
     }
 
     public void onBindViewHolder(HourlyForecastAdapter.ViewHolder holder, int position) {
-        Hourly_forecast mHourly_forecast = mHourly_forecastList.get(position);
+        HourlyForecast mHourly_forecast = mHourly_forecastList.get(position);
 
         if (position == 0){
             holder.mTime.setText("现在");

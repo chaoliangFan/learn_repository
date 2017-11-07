@@ -3,8 +3,11 @@ package com.example.fanxh.simpleweather;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +21,9 @@ import android.widget.Toast;
 import com.example.fanxh.simpleweather.db.City;
 import com.example.fanxh.simpleweather.db.County;
 import com.example.fanxh.simpleweather.db.Province;
+import com.example.fanxh.simpleweather.db.SWDatabase;
 import com.example.fanxh.simpleweather.util.HttpUtil;
 import com.example.fanxh.simpleweather.util.Utility;
-
-import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,6 +47,8 @@ public class ChooseAreaFragment extends Fragment {
     private ListView mShowArea;
     private ArrayAdapter<String> mShowAreaAdapter;
     private List<String> dataList = new ArrayList<>();
+    private static SWDatabase swDatabase;
+    public static SQLiteDatabase db;
     /**
      * 省列表
      */
@@ -60,10 +64,14 @@ public class ChooseAreaFragment extends Fragment {
     /**
      * 选中的省份
      */
+    private String selectedProvinceF;
     private Province selectedProvince;
     /**
      * 选中的城市
      */
+    private String selectedCityF;
+    private String selectedCountyF;
+
     private City selectedCity;
     private County selectedCounty;
     /**
@@ -75,6 +83,8 @@ public class ChooseAreaFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.choose_area_fragment, container, false);
+        swDatabase = new SWDatabase(getActivity(), "SimpleWeather.db", null, 1);
+        db = swDatabase.getWritableDatabase();
         mTitleText = (TextView) view.findViewById(R.id.title_text);
         mBackButton = (Button) view.findViewById(R.id.back_button);
         mShowArea = (ListView) view.findViewById(R.id.list_view);
@@ -90,31 +100,32 @@ public class ChooseAreaFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (currentLevel == LEVEL_PROVINCE) {
-                    selectedProvince = provinceList.get(position);
+                    selectedProvinceF = dataList.get(position);
                     queryCities();
                 } else if (currentLevel == LEVEL_CITY) {
-                    selectedCity = cityList.get(position);
+                    selectedCityF = dataList.get(position);
                     queryCounties();
                 } else if (currentLevel == LEVEL_COUNTY) {
-                    selectedCounty = countyList.get(position);
-                    String weatherId = selectedCounty.getWeatherId();
-
-
-
-                    Intent intent = new Intent(getActivity(), SearchAreaActivity.class);
-                    intent.putExtra("weather_id", weatherId);
-                    getActivity().startActivity(intent);
+                    selectedCountyF = dataList.get(position);
+                    Cursor cursor = db.query("County", null, "county_name = ?", new String[]{selectedCountyF}, null, null, null);
+                    if (cursor.moveToFirst()) {
+                        String weatherId = cursor.getString(cursor.getColumnIndex("weatherId"));
+                        Intent intent = new Intent(getActivity(), SearchAreaActivity.class);
+                        intent.putExtra("weather_id", weatherId);
+                        intent.putExtra("countyName",selectedCountyF);
+                        getActivity().startActivity(intent);
+                    }
+                    cursor.close();
                     getActivity().finish();
+
                 }
-
-
-                /**
-                 * 获取查看的天气的地区
-                 */
-
-
             }
         });
+
+        /**
+         * 获取查看的天气的地区
+         */
+
         mBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,15 +145,21 @@ public class ChooseAreaFragment extends Fragment {
     private void queryProvinces() {
         mTitleText.setText("中国");
         mBackButton.setVisibility(View.GONE);
-        provinceList = DataSupport.findAll(Province.class);
-        if (provinceList.size() > 0) {
+
+        Cursor cursor = db.query("Province", null, null, null, null, null, null);
+        if (cursor.moveToFirst()) {
             dataList.clear();
-            for (Province province : provinceList) {
-                dataList.add(province.getProvinceName());
+            if (cursor.moveToFirst()) {
+                Log.d("************", "cursor.moveToFirst   " + cursor.moveToFirst());
+                do {
+                    String provinceName = cursor.getString(cursor.getColumnIndex("province_name"));
+                    dataList.add(provinceName);
+                } while (cursor.moveToNext());
             }
             mShowAreaAdapter.notifyDataSetChanged();
             mShowArea.setSelection(0);
             currentLevel = LEVEL_PROVINCE;
+            cursor.close();
         } else {
             String address = "http://guolin.tech/api/china";
             queryFromServe(address, "province");
@@ -153,45 +170,66 @@ public class ChooseAreaFragment extends Fragment {
      * 查询选中的所有的市，优先从数据库中查询，如果没有查到再去服务器上查询
      */
     private void queryCities() {
-        mTitleText.setText(selectedProvince.getProvinceName());
+        mTitleText.setText(selectedProvinceF);
         mBackButton.setVisibility(View.VISIBLE);
-        cityList = DataSupport.where("provinceid = ?", String.valueOf(selectedProvince.getId())).find(City.class);
-        if (cityList.size() > 0) {
-            dataList.clear();
-            for (City city : cityList) {
-                dataList.add(city.getCityName());
+        Cursor cursor = db.query("Province", null, "province_name = ?", new String[]{selectedProvinceF}, null, null, null);
+        if (cursor.moveToFirst()) {
+            int provinceCode = cursor.getInt(cursor.getColumnIndex("province_code"));
+
+            cursor = db.query("City", null, "province_id = ?", new String[]{"" + provinceCode}, null, null, null);
+            if (cursor.moveToFirst()) {
+                if (cursor.moveToFirst()) {
+                    dataList.clear();
+                    do {
+                        String cityName = cursor.getString(cursor.getColumnIndex("city_name"));
+                        dataList.add(cityName);
+                    } while (cursor.moveToNext());
+                }
+                mShowAreaAdapter.notifyDataSetChanged();
+                mShowArea.setSelection(0);
+                currentLevel = LEVEL_CITY;
+
+            } else {
+                String address = "http://guolin.tech/api/china/" + provinceCode;
+                queryFromServe(address, "city");
             }
-            mShowAreaAdapter.notifyDataSetChanged();
-            mShowArea.setSelection(0);
-            currentLevel = LEVEL_CITY;
-        } else {
-            int provinceCode = selectedProvince.getProvinceCode();
-            String address = "http://guolin.tech/api/china/" + provinceCode;
-            queryFromServe(address, "city");
         }
+        cursor.close();
     }
 
     /**
      * 查询选中的市内的所有县，优先从数据库查询，如果没有查询到再去服务器上查询
      */
     private void queryCounties() {
-        mTitleText.setText(selectedCity.getCityName());
+        mTitleText.setText(selectedCityF);
         mBackButton.setVisibility(View.VISIBLE);
-        countyList = DataSupport.where("cityid = ?", String.valueOf(selectedCity.getId())).find(County.class);
-        if (countyList.size() > 0) {
-            dataList.clear();
-            for (County county : countyList) {
-                dataList.add(county.getCountyName());
+
+        Cursor cursor = db.query("City", null, "city_name = ?", new String[]{selectedCityF}, null, null, null);
+        if (cursor.moveToFirst()) {
+            int cityCode = cursor.getInt(cursor.getColumnIndex("city_code"));
+            cursor = db.query("County", null, "city_id = ?", new String[]{"" + cityCode}, null, null, null);
+            if (cursor.moveToFirst()) {
+                dataList.clear();
+                if (cursor.moveToFirst()) {
+                    do {
+                        String countyName = cursor.getString(cursor.getColumnIndex("county_name"));
+                        dataList.add(countyName);
+                    } while (cursor.moveToNext());
+                    mShowAreaAdapter.notifyDataSetChanged();
+                    mShowArea.setSelection(0);
+                    currentLevel = LEVEL_COUNTY;
+                }
+            } else {
+                Cursor cursor1 = db.query("City", null, "city_name = ?", new String[]{selectedCityF}, null, null, null);
+
+                if (cursor1.moveToFirst()) {
+                    int provinceCode = cursor1.getInt(cursor1.getColumnIndex("province_id"));
+                    String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
+                    queryFromServe(address, "county");
+                }
             }
-            mShowAreaAdapter.notifyDataSetChanged();
-            mShowArea.setSelection(0);
-            currentLevel = LEVEL_COUNTY;
-        } else {
-            int provinceCode = selectedProvince.getProvinceCode();
-            int cityCode = selectedCity.getCityCode();
-            String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
-            queryFromServe(address, "county");
         }
+        cursor.close();
     }
 
     /**
@@ -200,6 +238,7 @@ public class ChooseAreaFragment extends Fragment {
     private void queryFromServe(String address, final String type) {
         showProgressDialog();
         HttpUtil.sendOkHttpRequest(address, new Callback() {
+
             @Override
             public void onFailure(Call call, IOException e) {
                 getActivity().runOnUiThread(new Runnable() {
@@ -217,11 +256,25 @@ public class ChooseAreaFragment extends Fragment {
                 String responseText = response.body().string();
                 boolean result = false;
                 if ("province".equals(type)) {
-                    result = Utility.handleProvincesResponse(responseText);
+                    result = Utility.handleProvincesResponse(responseText, db);
                 } else if ("city".equals(type)) {
-                    result = Utility.handleCitiesResponse(responseText, selectedProvince.getId());
+
+                    Cursor cursor = db.query("Province", null, "province_name = ?", new String[]{selectedProvinceF}, null, null, null);
+                    if (cursor.moveToFirst()) {
+                        int provinceCode = cursor.getInt(cursor.getColumnIndex("province_code"));
+
+
+                        result = Utility.handleCitiesResponse(responseText, provinceCode, db);
+                    }
+                    cursor.close();
                 } else if ("county".equals(type)) {
-                    result = Utility.handleCountiesResponse(responseText, selectedCity.getId());
+
+                    Cursor cursor = db.query("City", null, "city_name = ?", new String[]{selectedCityF}, null, null, null);
+                    if (cursor.moveToFirst()) {
+                        int cityCode = cursor.getInt(cursor.getColumnIndex("city_code"));
+                        result = Utility.handleCountiesResponse(responseText, cityCode, db);
+                    }
+                    cursor.close();
                 }
                 if (result) {
                     getActivity().runOnUiThread(new Runnable() {

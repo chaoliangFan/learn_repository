@@ -19,9 +19,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".WeatherActivity" />
-        <activity android:name=".ChangeArea" />
-        <activity android:name=".SearchAreaActivity"></activity>
+        <activity
+            android:name=".WeatherActivity"/>
+        <activity
+            android:name=".ChangeArea" />
+        <activity
+            android:name=".SearchAreaActivity">
+        </activity>
     </application>
 
 </manifest>

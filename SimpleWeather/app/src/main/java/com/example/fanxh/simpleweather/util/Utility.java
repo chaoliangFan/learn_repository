@@ -1,6 +1,8 @@
 package com.example.fanxh.simpleweather.util;
 
 import android.annotation.TargetApi;
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Paint;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
@@ -23,19 +25,22 @@ import org.json.JSONObject;
 
 public class Utility {
     public static Weather weather;
+    public static ContentValues values = new ContentValues();
+
     /**
      *解析和处理服务器返回的省级数据
      */
-    public static boolean handleProvincesResponse(String response){
+    public static boolean handleProvincesResponse(String response,SQLiteDatabase db){
         if (!TextUtils.isEmpty(response)){
             try {
                 JSONArray allProvinces = new JSONArray(response);
                 for (int i = 0;i<allProvinces.length();i++){
                     JSONObject provinceObject = allProvinces.getJSONObject(i);
-                    Province province = new Province();
-                    province.setProvinceName(provinceObject.getString("name"));
-                    province.setProvinceCode(provinceObject.getInt("id"));
-                    province.save();
+
+                    values.put("province_name",provinceObject.getString("name"));
+                    values.put("province_code",provinceObject.getInt("id"));
+                    db.insert("Province",null,values);
+                    values.clear();
                 }
                 return true;
             } catch (JSONException e) {
@@ -48,17 +53,18 @@ public class Utility {
     /**
      * 解析和处理服务器返回的市级数据
      */
-    public static boolean handleCitiesResponse(String response, int provinceId){
+    public static boolean handleCitiesResponse(String response, int provinceId,SQLiteDatabase db){
         if (!TextUtils.isEmpty(response)){
             try {
                 JSONArray allCities = new JSONArray(response);
                 for (int i = 0;i<allCities.length();i++){
                     JSONObject cityObject = allCities.getJSONObject(i);
-                    City city = new City();
-                    city.setCityName(cityObject.getString("name"));
-                    city.setCityCode(cityObject.getInt("id"));
-                    city.setProvinceId(provinceId);
-                    city.save();
+
+                    values.put("city_name",cityObject.getString("name"));
+                    values.put("city_code",cityObject.getInt("id"));
+                    values.put("province_id",provinceId);
+                    db.insert("City",null,values);
+                    values.clear();
                 }
                 return true;
             } catch (JSONException e) {
@@ -71,17 +77,18 @@ public class Utility {
     /**
      * 解析和处理服务器返回的区或县级数据
      */
-    public static boolean handleCountiesResponse(String response, int cityId){
+    public static boolean handleCountiesResponse(String response, int cityId,SQLiteDatabase db){
         if (!TextUtils.isEmpty(response)){
             try {
                 JSONArray allCounties = new JSONArray(response);
                 for (int i = 0;i<allCounties.length();i++){
                     JSONObject countyObject = allCounties.getJSONObject(i);
-                    County county = new County();
-                    county.setCountyName(countyObject.getString("name"));
-                    county.setWeatherId(countyObject.getString("weather_id"));
-                    county.setCityId(cityId);
-                    county.save();
+
+                    values.put("county_name",countyObject.getString("name"));
+                    values.put("weatherId",countyObject.getString("weather_id"));
+                    values.put("city_id",cityId);
+                    db.insert("County",null,values);
+                    values.clear();
                 }
                 return true;
             } catch (JSONException e) {

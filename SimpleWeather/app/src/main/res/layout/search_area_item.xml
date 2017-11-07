@@ -10,7 +10,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:layout_marginLeft="15dp"
-        android:text="----"
         android:textSize="13dp"/>
     <TextView
         android:id="@+id/city"
@@ -18,7 +17,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/system_time"
         android:layout_marginLeft="15dp"
-        android:text="-- --"
         android:textSize="30dp"/>
     <TextView
         android:id="@+id/degrees"
@@ -26,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="15dp"
         android:layout_centerVertical="true"
-        android:text="温度"
+        android:text="- -"
         android:layout_alignParentRight="true"
         android:textSize="50dp"/>
 

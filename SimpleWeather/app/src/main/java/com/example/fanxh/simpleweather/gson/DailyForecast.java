@@ -4,7 +4,7 @@ package com.example.fanxh.simpleweather.gson;
  * Created by fanxh on 2017/10/26.
  */
 
-public class Daily_forecast {
+public class DailyForecast {
     //湿度
     public String hum;
     //降水概率
