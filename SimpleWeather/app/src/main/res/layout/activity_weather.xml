@@ -7,6 +7,20 @@
     android:background="@drawable/i_weather_bg"
     android:orientation="vertical">
 
+    <android.support.v4.view.ViewPager
+        android:id="@+id/show_all_weather"
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_weight="1.0"/>
+
+<!--<fragment-->
+    <!--android:name="com.example.fanxh.simpleweather.ShowWeatherFragment"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="0dp"-->
+    <!--android:layout_weight="1.0"-->
+    />
+
+<!--
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,6 +55,7 @@
 
         </ScrollView>
     </LinearLayout>
+-->
 
 
 

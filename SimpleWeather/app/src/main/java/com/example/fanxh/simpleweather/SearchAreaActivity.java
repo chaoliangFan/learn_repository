@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -39,6 +40,7 @@ public class SearchAreaActivity extends Activity {
     private Button mChooseArea;
     private ImageView mOfficialWebsite;
     private LinearLayout mSearchAreaItem;
+
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -71,7 +73,7 @@ public class SearchAreaActivity extends Activity {
 
             requestWeather(weatherId);
         } else {
-            final List<InformationBean> informationBeans = DataSupport.findAll(InformationBean.class);
+                final List<InformationBean> informationBeans = DataSupport.findAll(InformationBean.class);
             mSearchAreaItem.removeAllViews();
             for (final InformationBean informationBean : informationBeans) {
                 View view = LayoutInflater.from(SearchAreaActivity.this).inflate(R.layout.search_area_item, mSearchAreaItem, false);
@@ -153,7 +155,9 @@ public class SearchAreaActivity extends Activity {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(SearchAreaActivity.this, WeatherActivity.class);
-                        intent.putExtra("weather_id", informationBean.getCity());
+                        intent.putExtra("item",informationBean.getItem());
+                        Log.d("**********","item=  "+informationBean.getItem());
+//                        intent.putExtra("weather_id", informationBean.getCity());
                         startActivity(intent);
                         requestWeather(informationBean.getCity());
                         finish();
@@ -187,8 +191,19 @@ public class SearchAreaActivity extends Activity {
                             mInformationBean.setCity(weather.basic.city);
                             mInformationBean.setDegrees(weather.now.tmp);
                             mInformationBean.setStatus(weather.now.cond.txt);
+//                            mInformationBean.setItem((DataSupport.findAll(InformationBean.class)).size());
+                            Log.d("***************","informationBeans.size:   "+DataSupport.findAll(InformationBean.class));
                             mInformationBean.save();
+
+
                             final List<InformationBean> informationBeans = DataSupport.findAll(InformationBean.class);
+
+                            for (int i=0;i<informationBeans.size();i++){
+                                    InformationBean mInformationBeanItem = new InformationBean();
+                                    mInformationBeanItem.setItem(i);
+                                    mInformationBeanItem.updateAll("city = ?",informationBeans.get(i).getCity());
+                            }
+
                             mSearchAreaItem.removeAllViews();
                             for (final InformationBean informationBean : informationBeans) {
                                 View view = LayoutInflater.from(SearchAreaActivity.this).inflate(R.layout.search_area_item, mSearchAreaItem, false);
@@ -240,10 +255,9 @@ public class SearchAreaActivity extends Activity {
                                     @Override
                                     public void onClick(View v) {
                                         Intent intent = new Intent(SearchAreaActivity.this, WeatherActivity.class);
-                                        intent.putExtra("weather_id", informationBean.getCity());
+                                        intent.putExtra("item",informationBean.getItem());
+  //                                      intent.putExtra("weather_id", informationBean.getCity());
                                         startActivity(intent);
-
-
 
                                         requestWeather(informationBean.getCity());
                                         finish();

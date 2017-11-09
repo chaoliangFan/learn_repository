@@ -7,9 +7,18 @@ import org.litepal.crud.DataSupport;
  */
 
 public class InformationBean extends DataSupport{
+    private int item;
     private String city;
     private String degrees;
     private String status;
+
+    public int getItem() {
+        return item;
+    }
+
+    public void setItem(int item) {
+        this.item = item;
+    }
 
     public String getStatus() {
         return status;
