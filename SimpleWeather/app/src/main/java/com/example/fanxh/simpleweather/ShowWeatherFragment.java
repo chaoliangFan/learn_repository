@@ -55,7 +55,7 @@ public class ShowWeatherFragment extends Fragment {
     private LinearLayout mDailyForecast;
     private Activity mAcitvity;
     private static HourlyForecastAdapter mHourlyForecastAdapter;
-    private static String weatherId;
+//    private static String weatherId;
 
     public static ShowWeatherFragment newInstance(String weatherId) {
         ShowWeatherFragment sWF = new ShowWeatherFragment();
@@ -104,12 +104,12 @@ public class ShowWeatherFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
-            weatherId = args.getString("weatherId");
-            requestWeather(weatherId);
+            String weatherId = args.getString("weatherId");
+            requestWeather(weatherId,weatherId);
         }
     }
 
-    public void requestWeather(final String weatherId) {
+    public void requestWeather(final String weatherId, final String countyName) {
         String weatherUrl = "https://free-api.heweather.com/v5/weather?city=" +
                 weatherId + "&key=168d59faf85840c0b262b671067367e1";
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
@@ -134,13 +134,13 @@ public class ShowWeatherFragment extends Fragment {
                 mAcitvity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        mTitleCity.setText(countyName);
                         Toast.makeText(getActivity(), "获取天气信息失败", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         });
     }
-
 
     public void showWeatherInformation(Weather weather) {
         mTitleCity.setText(weather.basic.city);
