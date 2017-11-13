@@ -1,12 +1,10 @@
 package com.example.fanxh.simpleweather.db;
 
-import org.litepal.crud.DataSupport;
-
 /**
  * Created by fanxh on 2017/10/23.
  */
 
-public class Province extends DataSupport {
+public class Province{
     private int id;
     private String provinceName;
     private int provinceCode;

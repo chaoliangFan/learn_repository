@@ -8,12 +8,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <View
+            android:id="@+id/content_view"
+            android:layout_width="1dp"
+            android:layout_height="5dp"
+            android:layout_centerHorizontal="true"
+            android:background="@color/contentView"/>
+
         <TextView
             android:id="@+id/sunrise"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="200dp"
+            android:layout_toLeftOf="@id/content_view"
+            android:layout_marginRight="15dp"
             android:layout_marginTop="5dp"
             android:text="日出:"
             android:textColor="@color/mainColor"
@@ -23,8 +30,8 @@
             android:id="@+id/sunris_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="190dp"
+            android:layout_toRightOf="@id/content_view"
+            android:layout_marginLeft="15dp"
             android:layout_marginTop="5dp"
             android:textColor="@color/mainColor"
             android:textSize="15dp" />
@@ -52,13 +59,19 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <View
+            android:id="@+id/content_view1"
+            android:layout_width="1dp"
+            android:layout_height="5dp"
+            android:layout_centerHorizontal="true"
+            android:background="@color/contentView"/>
 
         <TextView
             android:id="@+id/rainfall_probability"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="200dp"
+            android:layout_toLeftOf="@id/content_view1"
+            android:layout_marginRight="15dp"
             android:layout_marginTop="5dp"
             android:text="降雨概率:"
             android:textColor="@color/mainColor"
@@ -68,8 +81,8 @@
             android:id="@+id/rainfall_probability_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="190dp"
+            android:layout_toRightOf="@id/content_view1"
+            android:layout_marginLeft="15dp"
             android:layout_marginTop="5dp"
             android:textColor="@color/mainColor"
             android:textSize="15dp" />
@@ -98,12 +111,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <View
+            android:id="@+id/content_view2"
+            android:layout_width="1dp"
+            android:layout_height="5dp"
+            android:layout_centerHorizontal="true"
+            android:background="@color/contentView"/>
         <TextView
             android:id="@+id/air_speed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="200dp"
+            android:layout_toLeftOf="@id/content_view2"
+            android:layout_marginRight="15dp"
             android:layout_marginTop="5dp"
             android:text="风速:"
             android:textColor="@color/mainColor"
@@ -113,8 +132,8 @@
             android:id="@+id/air_speed_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="190dp"
+            android:layout_toRightOf="@id/content_view2"
+            android:layout_marginLeft="15dp"
             android:layout_marginTop="5dp"
             android:textColor="@color/mainColor"
             android:textSize="15dp" />
@@ -143,13 +162,19 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <View
+            android:id="@+id/content_view3"
+            android:layout_width="1dp"
+            android:layout_height="5dp"
+            android:layout_centerHorizontal="true"
+            android:background="@color/contentView"/>
 
         <TextView
             android:id="@+id/precipitation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="200dp"
+            android:layout_toLeftOf="@id/content_view3"
+            android:layout_marginRight="15dp"
             android:layout_marginTop="5dp"
             android:text="降水量:"
             android:textColor="@color/mainColor"
@@ -159,8 +184,8 @@
             android:id="@+id/precipitation_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="190dp"
+            android:layout_toRightOf="@id/content_view3"
+            android:layout_marginLeft="15dp"
             android:layout_marginTop="5dp"
             android:textColor="@color/mainColor"
             android:textSize="15dp" />
@@ -188,13 +213,19 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <View
+            android:id="@+id/content_view4"
+            android:layout_width="1dp"
+            android:layout_height="5dp"
+            android:layout_centerHorizontal="true"
+            android:background="@color/contentView"/>
 
         <TextView
             android:id="@+id/visibility"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="200dp"
+            android:layout_toLeftOf="@id/content_view4"
+            android:layout_marginRight="15dp"
             android:layout_marginTop="5dp"
             android:text="能见度:"
             android:textColor="@color/mainColor"
@@ -204,8 +235,8 @@
             android:id="@+id/visibility_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="190dp"
+            android:layout_toRightOf="@id/content_view4"
+            android:layout_marginLeft="15dp"
             android:layout_marginTop="5dp"
             android:textColor="@color/mainColor"
             android:textSize="15dp" />
@@ -233,13 +264,19 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <View
+            android:id="@+id/content_view5"
+            android:layout_width="1dp"
+            android:layout_height="5dp"
+            android:layout_centerHorizontal="true"
+            android:background="@color/contentView"/>
 
         <TextView
             android:id="@+id/aqi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="200dp"
+            android:layout_toLeftOf="@id/content_view5"
+            android:layout_marginRight="15dp"
             android:layout_marginTop="5dp"
             android:text="空气质量指数:"
             android:textColor="@color/mainColor"
@@ -249,8 +286,8 @@
             android:id="@+id/aqi_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="190dp"
+            android:layout_toRightOf="@id/content_view5"
+            android:layout_marginLeft="15dp"
             android:layout_marginTop="5dp"
             android:textColor="@color/mainColor"
             android:textSize="15dp" />

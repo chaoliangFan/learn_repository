@@ -83,7 +83,7 @@ public class ChooseAreaFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.choose_area_fragment, container, false);
-        swDatabase = new SWDatabase(getActivity(), "SimpleWeather.db", null, 1);
+        swDatabase = new SWDatabase(getActivity(), "SimpleWeather.db", null, 2);
         db = swDatabase.getWritableDatabase();
         mTitleText = (TextView) view.findViewById(R.id.title_text);
         mBackButton = (Button) view.findViewById(R.id.back_button);
@@ -150,7 +150,6 @@ public class ChooseAreaFragment extends Fragment {
         if (cursor.moveToFirst()) {
             dataList.clear();
             if (cursor.moveToFirst()) {
-                Log.d("************", "cursor.moveToFirst   " + cursor.moveToFirst());
                 do {
                     String provinceName = cursor.getString(cursor.getColumnIndex("province_name"));
                     dataList.add(provinceName);
@@ -221,7 +220,6 @@ public class ChooseAreaFragment extends Fragment {
                 }
             } else {
                 Cursor cursor1 = db.query("City", null, "city_name = ?", new String[]{selectedCityF}, null, null, null);
-
                 if (cursor1.moveToFirst()) {
                     int provinceCode = cursor1.getInt(cursor1.getColumnIndex("province_id"));
                     String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
@@ -258,17 +256,13 @@ public class ChooseAreaFragment extends Fragment {
                 if ("province".equals(type)) {
                     result = Utility.handleProvincesResponse(responseText, db);
                 } else if ("city".equals(type)) {
-
                     Cursor cursor = db.query("Province", null, "province_name = ?", new String[]{selectedProvinceF}, null, null, null);
                     if (cursor.moveToFirst()) {
                         int provinceCode = cursor.getInt(cursor.getColumnIndex("province_code"));
-
-
                         result = Utility.handleCitiesResponse(responseText, provinceCode, db);
                     }
                     cursor.close();
                 } else if ("county".equals(type)) {
-
                     Cursor cursor = db.query("City", null, "city_name = ?", new String[]{selectedCityF}, null, null, null);
                     if (cursor.moveToFirst()) {
                         int cityCode = cursor.getInt(cursor.getColumnIndex("city_code"));

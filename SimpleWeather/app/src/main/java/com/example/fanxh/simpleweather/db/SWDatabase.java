@@ -23,6 +23,11 @@ public class SWDatabase extends SQLiteOpenHelper {
             +"county_name text,"
             +"weatherId text,"
             + "city_id integer)";
+    public static final String CREATE_INFORMATION = "create table Information("
+            +"id integer primary key autoincrement,"
+            +"county_name text,"
+            +"status text,"
+            +"degree text)";
 
     public SWDatabase(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -33,10 +38,21 @@ public class SWDatabase extends SQLiteOpenHelper {
         db.execSQL(CREATE_PROVINCE);
         db.execSQL(CREATE_CITY);
         db.execSQL(CREATE_COUNTY);
+        db.execSQL(CREATE_INFORMATION);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        switch (oldVersion){
+            case 2:
+                db.execSQL("drop table if exists Province");
+                db.execSQL("drop table if exists City");
+                db.execSQL("drop table if exists County");
+                db.execSQL("drop table if exists Information");
+                onCreate(db);
+                break;
+            default:
+                break;
+        }
     }
 }
