@@ -142,29 +142,30 @@ public class Utility {
         Calendar c = Calendar.getInstance();
         try {
             c.setTime(format.parse(pTime));
+            if (c.get(Calendar.DAY_OF_WEEK) == 1) {
+                Week += "日";
+            }
+            if (c.get(Calendar.DAY_OF_WEEK) == 2) {
+                Week += "一";
+            }
+            if (c.get(Calendar.DAY_OF_WEEK) == 3) {
+                Week += "二";
+            }
+            if (c.get(Calendar.DAY_OF_WEEK) == 4) {
+                Week += "三";
+            }
+            if (c.get(Calendar.DAY_OF_WEEK) == 5) {
+                Week += "四";
+            }
+            if (c.get(Calendar.DAY_OF_WEEK) == 6) {
+                Week += "五";
+            }
+            if (c.get(Calendar.DAY_OF_WEEK) == 7) {
+                Week += "六";
+            }
         } catch (Exception e) {
+            Week += "非日期或格式有误";
             e.printStackTrace();
-        }
-        if (c.get(Calendar.DAY_OF_WEEK) == 1) {
-            Week += "日";
-        }
-        if (c.get(Calendar.DAY_OF_WEEK) == 2) {
-            Week += "一";
-        }
-        if (c.get(Calendar.DAY_OF_WEEK) == 3) {
-            Week += "二";
-        }
-        if (c.get(Calendar.DAY_OF_WEEK) == 4) {
-            Week += "三";
-        }
-        if (c.get(Calendar.DAY_OF_WEEK) == 5) {
-            Week += "四";
-        }
-        if (c.get(Calendar.DAY_OF_WEEK) == 6) {
-            Week += "五";
-        }
-        if (c.get(Calendar.DAY_OF_WEEK) == 7) {
-            Week += "六";
         }
         return Week;
     }
