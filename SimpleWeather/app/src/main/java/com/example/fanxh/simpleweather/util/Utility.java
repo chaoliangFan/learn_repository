@@ -37,11 +37,11 @@ public class Utility {
             try {
                 JSONArray allProvinces = new JSONArray(response);
                 for (int i = 0; i < allProvinces.length(); i++) {
+                    values.clear();
                     JSONObject provinceObject = allProvinces.getJSONObject(i);
                     values.put("province_name", provinceObject.getString("name"));
                     values.put("province_code", provinceObject.getInt("id"));
                     db.insert("Province", null, values);
-                    values.clear();
                 }
                 db.setTransactionSuccessful();
                 return true;
@@ -63,12 +63,12 @@ public class Utility {
             try {
                 JSONArray allCities = new JSONArray(response);
                 for (int i = 0; i < allCities.length(); i++) {
+                    values.clear();
                     JSONObject cityObject = allCities.getJSONObject(i);
                     values.put("city_name", cityObject.getString("name"));
                     values.put("city_code", cityObject.getInt("id"));
                     values.put("province_id", provinceId);
                     db.insert("City", null, values);
-                    values.clear();
                 }
                 db.setTransactionSuccessful();
                 return true;
@@ -91,12 +91,11 @@ public class Utility {
                 JSONArray allCounties = new JSONArray(response);
                 for (int i = 0; i < allCounties.length(); i++) {
                     JSONObject countyObject = allCounties.getJSONObject(i);
-
+                    values.clear();
                     values.put("county_name", countyObject.getString("name"));
                     values.put("weatherId", countyObject.getString("weather_id"));
                     values.put("city_id", cityId);
                     db.insert("County", null, values);
-                    values.clear();
                 }
                 db.setTransactionSuccessful();
                 return true;

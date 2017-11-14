@@ -70,108 +70,112 @@ public class SearchAreaActivity extends Activity {
         });
         String weatherId = getIntent().getStringExtra("weather_id");
         if (!TextUtils.isEmpty(weatherId)) {
-            requestWeather(weatherId, "");
+            addWeather(weatherId, "");
         } else {
-
-            mSearchAreaItem.removeAllViews();
-            final List<String> cNList = new ArrayList<String>();
-            Cursor cursor = db.query("Information", null, null, null, null, null, null);
-            if (cursor.moveToFirst()) {
-                do {
-                    final String county_name = cursor.getString(cursor.getColumnIndex("county_name"));
-                    String status = cursor.getString(cursor.getColumnIndex("status"));
-                    String degree = cursor.getString(cursor.getColumnIndex("degree"));
-                    cNList.add(county_name);
-                    View view = LayoutInflater.from(SearchAreaActivity.this).inflate(R.layout.search_area_item, mSearchAreaItem, false);
-                    TextView mSystemTime = (TextView) view.findViewById(R.id.system_time);
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
-                    String t = format.format(new Date());
-                    if (Time(t) < 10) {
-                        mSystemTime.setText("上午" + t.substring(12, 16));
-                    } else if (10 <= Time(t) && Time(t) < 12) {
-                        mSystemTime.setText("上午" + t.substring(11, 16));
-                    } else if (Time(t) == 12) {
-                        mSystemTime.setText("下午12时");
-                    } else {
-                        mSystemTime.setText("下午" + Integer.toString(Time(t) - 12) + t.substring(13, 16));
-                    }
-                    TextView mCity = (TextView) view.findViewById(R.id.city);
-                    mCity.setText(county_name);
-                    if (!TextUtils.isEmpty(degree)) {
-                        TextView mDegrees = (TextView) view.findViewById(R.id.degrees);
-                        mDegrees.setText(degree);
-                        switch (status) {
-                            case "晴":
-                                view.setBackgroundResource(R.drawable.ic_choose_sun_bg);
-                                break;
-                            case "阴":
-                                view.setBackgroundResource(R.drawable.ic_choose_overcast_bg);
-                                break;
-                            case "多云":
-                                view.setBackgroundResource(R.drawable.ic_choose_cloudy_bg);
-                                break;
-                            case "小雨":
-                                view.setBackgroundResource(R.drawable.i_light_rain);
-                                break;
-                            case "中雨":
-                                view.setBackgroundResource(R.drawable.i_moderate_rain);
-                                break;
-                            case "大雨":
-                                view.setBackgroundResource(R.drawable.i_heavy_rain);
-                                break;
-                            case "阵雨":
-                                view.setBackgroundResource(R.drawable.i_shower_rain);
-                                break;
-                            default:
-                                break;
-                        }
-
-                    }
-
-                    view.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View v) {
-                            AlertDialog.Builder dialog = new AlertDialog.Builder(SearchAreaActivity.this);
-                            dialog.setCancelable(true);
-                            dialog.setPositiveButton("删除", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    try {
-                                        db.delete("Information", "county_name = ?", new String[]{county_name});
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                    onCreate(null);
-                                }
-                            });
-                            dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            });
-                            dialog.show();
-                            return true;
-                        }
-                    });
-                    view.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(SearchAreaActivity.this, WeatherActivity.class);
-                            intent.putExtra("item", getIndex(cNList, county_name));
-                            startActivity(intent);
-                            requestWeather(county_name, "value");
-                            finish();
-                        }
-                    });
-                    mSearchAreaItem.addView(view);
-
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
+            showAllWeather();
         }
     }
 
-    public void requestWeather(final String weatherId, final String value) {
+    public void showAllWeather() {
+        mSearchAreaItem.removeAllViews();
+        final List<String> cNList = new ArrayList<String>();
+        Cursor cursor = db.query("Information", null, null, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                final String county_name = cursor.getString(cursor.getColumnIndex("county_name"));
+                String status = cursor.getString(cursor.getColumnIndex("status"));
+                String degree = cursor.getString(cursor.getColumnIndex("degree"));
+                cNList.add(county_name);
+                View view = LayoutInflater.from(SearchAreaActivity.this).inflate(R.layout.search_area_item, mSearchAreaItem, false);
+                TextView mSystemTime = (TextView) view.findViewById(R.id.system_time);
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+                String t = format.format(new Date());
+                if (Time(t) < 10) {
+                    mSystemTime.setText("上午" + t.substring(12, 16));
+                } else if (10 <= Time(t) && Time(t) < 12) {
+                    mSystemTime.setText("上午" + t.substring(11, 16));
+                } else if (Time(t) == 12) {
+                    mSystemTime.setText("下午12时");
+                } else {
+                    mSystemTime.setText("下午" + Integer.toString(Time(t) - 12) + t.substring(13, 16));
+                }
+                TextView mCity = (TextView) view.findViewById(R.id.city);
+                mCity.setText(county_name);
+                if (!TextUtils.isEmpty(degree)) {
+                    TextView mDegrees = (TextView) view.findViewById(R.id.degrees);
+                    mDegrees.setText(degree);
+                    switch (status) {
+                        case "晴":
+                            view.setBackgroundResource(R.drawable.ic_choose_sun_bg);
+                            break;
+                        case "阴":
+                            view.setBackgroundResource(R.drawable.ic_choose_overcast_bg);
+                            break;
+                        case "多云":
+                            view.setBackgroundResource(R.drawable.ic_choose_cloudy_bg);
+                            break;
+                        case "小雨":
+                            view.setBackgroundResource(R.drawable.i_light_rain);
+                            break;
+                        case "中雨":
+                            view.setBackgroundResource(R.drawable.i_moderate_rain);
+                            break;
+                        case "大雨":
+                            view.setBackgroundResource(R.drawable.i_heavy_rain);
+                            break;
+                        case "阵雨":
+                            view.setBackgroundResource(R.drawable.i_shower_rain);
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
+
+                view.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(SearchAreaActivity.this);
+                        dialog.setCancelable(true);
+                        dialog.setPositiveButton("删除", new DialogInterface.OnClickListener() {
+                            @RequiresApi(api = Build.VERSION_CODES.N)
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                try {
+                                    db.delete("Information", "county_name = ?", new String[]{county_name});
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                onCreate(null);
+                            }
+                        });
+                        dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+                        dialog.show();
+                        return true;
+                    }
+                });
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(SearchAreaActivity.this, WeatherActivity.class);
+                        intent.putExtra("item", getIndex(cNList, county_name));
+                        startActivity(intent);
+                        addWeather(county_name, "value");
+                        finish();
+                    }
+                });
+                mSearchAreaItem.addView(view);
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+    }
+
+    public void addWeather(final String weatherId, final String value) {
         String weatherUrl = "https://free-api.heweather.com/v5/weather?city=" +
                 weatherId + "&key=168d59faf85840c0b262b671067367e1";
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
@@ -191,11 +195,11 @@ public class SearchAreaActivity extends Activity {
                         }
                         if (weather != null && "ok".equals(weather.status)) {
                             ContentValues values = new ContentValues();
+                            values.clear();
                             values.put("county_name", weather.basic.city);
                             values.put("degree", weather.now.tmp);
                             values.put("status", weather.now.cond.txt);
                             db.insert("Information", null, values);
-                            values.clear();
                             if (TextUtils.isEmpty(value)) {
                                 Intent intent = new Intent(SearchAreaActivity.this, SearchAreaActivity.class);
                                 intent.putExtra("weather_id", "");
@@ -222,9 +226,9 @@ public class SearchAreaActivity extends Activity {
                                 Toast.makeText(SearchAreaActivity.this, "城市获取失败，请换个城市", Toast.LENGTH_SHORT).show();
                             }
                             ContentValues values = new ContentValues();
+                            values.clear();
                             values.put("county_name", countyName);
                             db.insert("Information", null, values);
-                            values.clear();
                         }
                         if (TextUtils.isEmpty(value)) {
                             Intent intent = new Intent(SearchAreaActivity.this, SearchAreaActivity.class);

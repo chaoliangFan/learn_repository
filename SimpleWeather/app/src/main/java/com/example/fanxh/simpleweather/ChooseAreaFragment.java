@@ -145,7 +145,6 @@ public class ChooseAreaFragment extends Fragment {
     private void queryProvinces() {
         mTitleText.setText("中国");
         mBackButton.setVisibility(View.GONE);
-
         Cursor cursor = db.query("Province", null, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             dataList.clear();

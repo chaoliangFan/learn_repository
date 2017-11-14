@@ -67,7 +67,7 @@ public class WeatherActivity extends FragmentActivity {
         mShowAllWeather.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-//               setTabSelection(mTabTVs[position]);
+ //              setTabSelection(mTabTVs[position]);
             }
 
             @Override
