@@ -32,7 +32,8 @@ public class WeatherActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
         Utility.ActivityCollector.addActivity(this);
-        swDatabase = new SWDatabase(this, "SimpleWeather.db", null, 2);
+//        swDatabase = new SWDatabase(this, "SimpleWeather.db", null, 2);
+        swDatabase = new SWDatabase(this);
         db = swDatabase.getWritableDatabase();
         mWebLeft = (ImageView) findViewById(R.id.web_left);
         mChooseAreaRight = (ImageView) findViewById(R.id.choose_area_right);
@@ -51,23 +52,29 @@ public class WeatherActivity extends FragmentActivity {
                 startActivity(intent);
             }
         });
-        int item = getIntent().getIntExtra("item", 0);
+
         mShowAllWeather = (ViewPager) findViewById(R.id.show_all_weather);
         fragmentList = new ArrayList<>();
         fragmentList.clear();
         Cursor cursor = db.query("Information", null, null, null, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                String weatherId = cursor.getString(cursor.getColumnIndex("county_name"));
-                ShowWeatherFragment sWF = ShowWeatherFragment.newInstance(weatherId);
-                fragmentList.add(sWF);
-            } while (cursor.moveToNext());
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    String weatherId = cursor.getString(cursor.getColumnIndex("county_name"));
+                    ShowWeatherFragment sWF = ShowWeatherFragment.newInstance(weatherId);
+                    fragmentList.add(sWF);
+                } while (cursor.moveToNext());
+            }
         }
-        cursor.close();
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         mShowAllWeather.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
- //              setTabSelection(mTabTVs[position]);
+                //              setTabSelection(mTabTVs[position]);
             }
 
             @Override
@@ -80,6 +87,7 @@ public class WeatherActivity extends FragmentActivity {
         });
         mShowAllWeather.setOffscreenPageLimit(fragmentList.size());
         mShowAllWeather.setAdapter(new ShowWeatherFragmentAdapter(getSupportFragmentManager(), fragmentList));
+        int item = getIntent().getIntExtra("item", 0);
         mShowAllWeather.setCurrentItem(item);
     }
 
@@ -93,12 +101,18 @@ public class WeatherActivity extends FragmentActivity {
 
         @Override
         public int getCount() {
-            return list.size();
+            if (list != null) {
+                return list.size();
+            }
+            return 0;
         }
 
         @Override
         public Fragment getItem(int arg0) {
-            return list.get(arg0);
+            if (list.size() > arg0) {
+                return list.get(arg0);
+            }
+            return null;
         }
     }
 

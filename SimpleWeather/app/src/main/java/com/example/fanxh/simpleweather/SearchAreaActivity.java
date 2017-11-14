@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -26,8 +27,10 @@ import com.example.fanxh.simpleweather.util.HttpUtil;
 import com.example.fanxh.simpleweather.util.Utility;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -47,7 +50,8 @@ public class SearchAreaActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_area);
-        swDatabase = new SWDatabase(this, "SimpleWeather.db", null, 2);
+//        swDatabase = new SWDatabase(this, "SimpleWeather.db", null, 2);
+        swDatabase = new SWDatabase(this);
         db = swDatabase.getWritableDatabase();
         mSearchAreaItem = (LinearLayout) findViewById(R.id.search_area_item);
         mChooseArea = (Button) findViewById(R.id.choose_area);
@@ -90,14 +94,27 @@ public class SearchAreaActivity extends Activity {
                 TextView mSystemTime = (TextView) view.findViewById(R.id.system_time);
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
                 String t = format.format(new Date());
-                if (Time(t) < 10) {
-                    mSystemTime.setText("上午" + t.substring(12, 16));
-                } else if (10 <= Time(t) && Time(t) < 12) {
-                    mSystemTime.setText("上午" + t.substring(11, 16));
-                } else if (Time(t) == 12) {
-                    mSystemTime.setText("下午12时");
-                } else {
-                    mSystemTime.setText("下午" + Integer.toString(Time(t) - 12) + t.substring(13, 16));
+                try {
+                    Date date = format.parse(t);
+
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(date);
+                    int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                    int minute = calendar.get(Calendar.MINUTE);
+                    int second = calendar.get(Calendar.SECOND);
+
+
+                    if (hour < 10) {
+                        mSystemTime.setText("上午" + hour+":"+minute);
+                    } else if (10 <= hour && hour < 12) {
+                        mSystemTime.setText("上午" + hour+":"+minute);
+                    } else if (hour == 12) {
+                        mSystemTime.setText("下午" + hour+":"+minute);
+                    } else {
+                        mSystemTime.setText("下午" + (hour-12)+":"+minute);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
                 TextView mCity = (TextView) view.findViewById(R.id.city);
                 mCity.setText(county_name);

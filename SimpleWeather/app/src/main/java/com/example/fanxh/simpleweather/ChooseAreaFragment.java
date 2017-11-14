@@ -77,13 +77,14 @@ public class ChooseAreaFragment extends Fragment {
     /**
      * 当前选中的级别
      */
-    private int currentLevel;
+    public static int currentLevel;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.choose_area_fragment, container, false);
-        swDatabase = new SWDatabase(getActivity(), "SimpleWeather.db", null, 2);
+//        swDatabase = new SWDatabase(getActivity(), "SimpleWeather.db", null, 2);
+        swDatabase = new SWDatabase(getActivity());
         db = swDatabase.getWritableDatabase();
         mTitleText = (TextView) view.findViewById(R.id.title_text);
         mBackButton = (Button) view.findViewById(R.id.back_button);
@@ -139,10 +140,11 @@ public class ChooseAreaFragment extends Fragment {
         queryProvinces();
     }
 
+
     /**
      * 查询全国所有的省，优先从数据库里查询，如果没有查询到再去服务器上查询
      */
-    private void queryProvinces() {
+    public void queryProvinces() {
         mTitleText.setText("中国");
         mBackButton.setVisibility(View.GONE);
         Cursor cursor = db.query("Province", null, null, null, null, null, null);
@@ -167,7 +169,7 @@ public class ChooseAreaFragment extends Fragment {
     /**
      * 查询选中的所有的市，优先从数据库中查询，如果没有查到再去服务器上查询
      */
-    private void queryCities() {
+   public void queryCities() {
         mTitleText.setText(selectedProvinceF);
         mBackButton.setVisibility(View.VISIBLE);
         Cursor cursor = db.query("Province", null, "province_name = ?", new String[]{selectedProvinceF}, null, null, null);
@@ -198,7 +200,7 @@ public class ChooseAreaFragment extends Fragment {
     /**
      * 查询选中的市内的所有县，优先从数据库查询，如果没有查询到再去服务器上查询
      */
-    private void queryCounties() {
+    public void queryCounties() {
         mTitleText.setText(selectedCityF);
         mBackButton.setVisibility(View.VISIBLE);
 

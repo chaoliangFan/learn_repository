@@ -55,7 +55,6 @@ public class ShowWeatherFragment extends Fragment {
     private LinearLayout mDailyForecast;
     private Activity mAcitvity;
     private static HourlyForecastAdapter mHourlyForecastAdapter;
-//    private static String weatherId;
 
     public static ShowWeatherFragment newInstance(String weatherId) {
         ShowWeatherFragment sWF = new ShowWeatherFragment();

@@ -9,6 +9,8 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 
 public class SWDatabase extends SQLiteOpenHelper {
+    private final static String DATABASE_NAME="SimpleWeather.db";
+    private final static int VERSION=1;
     public static final String CREATE_PROVINCE = "create table Province("
             +"id integer primary key autoincrement,"
             +"province_name text,"
@@ -29,8 +31,8 @@ public class SWDatabase extends SQLiteOpenHelper {
             +"status text,"
             +"degree text)";
 
-    public SWDatabase(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, name, factory, version);
+    public SWDatabase(Context context) {
+        super(context, DATABASE_NAME, null, VERSION);
     }
 
     @Override
@@ -44,15 +46,11 @@ public class SWDatabase extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         switch (oldVersion){
+            case 1:
+                db.execSQL(CREATE_INFORMATION);
             case 2:
-                db.execSQL("drop table if exists Province");
-                db.execSQL("drop table if exists City");
-                db.execSQL("drop table if exists County");
-                db.execSQL("drop table if exists Information");
-                onCreate(db);
-                break;
+                db.execSQL("alter table Information add column title text");
             default:
-                break;
         }
     }
 }

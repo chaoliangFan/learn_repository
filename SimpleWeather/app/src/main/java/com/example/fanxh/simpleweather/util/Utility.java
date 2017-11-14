@@ -136,36 +136,36 @@ public class Utility {
 
     @TargetApi(Build.VERSION_CODES.N)
     public static String getWeek(String pTime) {
-        String Week = "";
+        String mWeek = "";
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Calendar c = Calendar.getInstance();
         try {
             c.setTime(format.parse(pTime));
-            if (c.get(Calendar.DAY_OF_WEEK) == 1) {
-                Week += "日";
+            if (c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+                mWeek += "日";
             }
-            if (c.get(Calendar.DAY_OF_WEEK) == 2) {
-                Week += "一";
+            if (c.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+                mWeek += "一";
             }
-            if (c.get(Calendar.DAY_OF_WEEK) == 3) {
-                Week += "二";
+            if (c.get(Calendar.DAY_OF_WEEK) == Calendar.TUESDAY) {
+                mWeek += "二";
             }
-            if (c.get(Calendar.DAY_OF_WEEK) == 4) {
-                Week += "三";
+            if (c.get(Calendar.DAY_OF_WEEK) == Calendar.WEDNESDAY) {
+                mWeek += "三";
             }
-            if (c.get(Calendar.DAY_OF_WEEK) == 5) {
-                Week += "四";
+            if (c.get(Calendar.DAY_OF_WEEK) == Calendar.THURSDAY) {
+                mWeek += "四";
             }
-            if (c.get(Calendar.DAY_OF_WEEK) == 6) {
-                Week += "五";
+            if (c.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) {
+                mWeek += "五";
             }
-            if (c.get(Calendar.DAY_OF_WEEK) == 7) {
-                Week += "六";
+            if (c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
+                mWeek += "六";
             }
         } catch (Exception e) {
-            Week += "非日期或格式有误";
+            mWeek += "非日期或格式有误";
             e.printStackTrace();
         }
-        return Week;
+        return mWeek;
     }
 }
