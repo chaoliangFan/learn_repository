@@ -1,6 +1,7 @@
 package com.example.fanxh.simpleweather;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,7 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.fanxh.simpleweather.db.SWDatabase;
+import com.example.fanxh.simpleweather.db.DbUtil;
 import com.example.fanxh.simpleweather.gson.Weather;
 import com.example.fanxh.simpleweather.util.HttpUtil;
 import com.example.fanxh.simpleweather.util.Utility;
@@ -39,10 +40,13 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class SearchAreaActivity extends Activity {
+    private static final String URLSTART = "https://free-api.heweather.com/s6/weather?location=";
+    private static final String URLEND = "&key=168d59faf85840c0b262b671067367e1";
+    private static final String WEBSITE = "http://tools.2345.com/m/rili.htm";
+    private ProgressDialog progressDidog;
     private Button mChooseArea;
     private ImageView mOfficialWebsite;
     private LinearLayout mSearchAreaItem;
-    private static SWDatabase swDatabase;
     private static SQLiteDatabase db;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -50,9 +54,8 @@ public class SearchAreaActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_area);
-//        swDatabase = new SWDatabase(this, "SimpleWeather.db", null, 2);
-        swDatabase = new SWDatabase(this);
-        db = swDatabase.getWritableDatabase();
+
+        db = DbUtil.getDb(this);
         mSearchAreaItem = (LinearLayout) findViewById(R.id.search_area_item);
         mChooseArea = (Button) findViewById(R.id.choose_area);
         mChooseArea.setOnClickListener(new View.OnClickListener() {
@@ -68,12 +71,15 @@ public class SearchAreaActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse("http://tools.2345.com/m/rili.htm"));
+                intent.setData(Uri.parse(WEBSITE));
                 startActivity(intent);
             }
         });
         String weatherId = getIntent().getStringExtra("weather_id");
+//        String weatherId = getIntent().getStringExtra("countyName");
+        Log.d("AAAAAAAAAA","weatherId--->"+weatherId);
         if (!TextUtils.isEmpty(weatherId)) {
+            showProgressDialog();
             addWeather(weatherId, "");
         } else {
             showAllWeather();
@@ -81,199 +87,243 @@ public class SearchAreaActivity extends Activity {
     }
 
     public void showAllWeather() {
+        closeProgressDialog();
         mSearchAreaItem.removeAllViews();
         final List<String> cNList = new ArrayList<String>();
-        Cursor cursor = db.query("Information", null, null, null, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                final String county_name = cursor.getString(cursor.getColumnIndex("county_name"));
-                String status = cursor.getString(cursor.getColumnIndex("status"));
-                String degree = cursor.getString(cursor.getColumnIndex("degree"));
-                cNList.add(county_name);
-                View view = LayoutInflater.from(SearchAreaActivity.this).inflate(R.layout.search_area_item, mSearchAreaItem, false);
-                TextView mSystemTime = (TextView) view.findViewById(R.id.system_time);
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
-                String t = format.format(new Date());
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
                 try {
-                    Date date = format.parse(t);
-
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(date);
-                    int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                    int minute = calendar.get(Calendar.MINUTE);
-                    int second = calendar.get(Calendar.SECOND);
-
-
-                    if (hour < 10) {
-                        mSystemTime.setText("上午" + hour+":"+minute);
-                    } else if (10 <= hour && hour < 12) {
-                        mSystemTime.setText("上午" + hour+":"+minute);
-                    } else if (hour == 12) {
-                        mSystemTime.setText("下午" + hour+":"+minute);
-                    } else {
-                        mSystemTime.setText("下午" + (hour-12)+":"+minute);
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                TextView mCity = (TextView) view.findViewById(R.id.city);
-                mCity.setText(county_name);
-                if (!TextUtils.isEmpty(degree)) {
-                    TextView mDegrees = (TextView) view.findViewById(R.id.degrees);
-                    mDegrees.setText(degree);
-                    switch (status) {
-                        case "晴":
-                            view.setBackgroundResource(R.drawable.ic_choose_sun_bg);
-                            break;
-                        case "阴":
-                            view.setBackgroundResource(R.drawable.ic_choose_overcast_bg);
-                            break;
-                        case "多云":
-                            view.setBackgroundResource(R.drawable.ic_choose_cloudy_bg);
-                            break;
-                        case "小雨":
-                            view.setBackgroundResource(R.drawable.i_light_rain);
-                            break;
-                        case "中雨":
-                            view.setBackgroundResource(R.drawable.i_moderate_rain);
-                            break;
-                        case "大雨":
-                            view.setBackgroundResource(R.drawable.i_heavy_rain);
-                            break;
-                        case "阵雨":
-                            view.setBackgroundResource(R.drawable.i_shower_rain);
-                            break;
-                        default:
-                            break;
-                    }
-
-                }
-
-                view.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        AlertDialog.Builder dialog = new AlertDialog.Builder(SearchAreaActivity.this);
-                        dialog.setCancelable(true);
-                        dialog.setPositiveButton("删除", new DialogInterface.OnClickListener() {
-                            @RequiresApi(api = Build.VERSION_CODES.N)
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
+                    Cursor cursor = db.query("Information", null, null, null, null, null, null);
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            do {
+                                final String county_name = cursor.getString(cursor.getColumnIndex("county_name"));
+                                String status = cursor.getString(cursor.getColumnIndex("status"));
+                                String degree = cursor.getString(cursor.getColumnIndex("degree"));
+                                cNList.add(county_name);
+                                View view = LayoutInflater.from(SearchAreaActivity.this).inflate(R.layout.search_area_item, mSearchAreaItem, false);
+                                TextView mSystemTime = (TextView) view.findViewById(R.id.system_time);
+                                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+                                String t = format.format(new Date());
                                 try {
-                                    db.delete("Information", "county_name = ?", new String[]{county_name});
-                                } catch (Exception e) {
+                                    Date date = format.parse(t);
+                                    Calendar calendar = Calendar.getInstance();
+                                    calendar.setTime(date);
+                                    int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                                    int minute = calendar.get(Calendar.MINUTE);
+                                    if (hour < 10) {
+                                        mSystemTime.setText("上午" + hour + ":" + minute);
+                                    } else if (10 <= hour && hour < 12) {
+                                        mSystemTime.setText("上午" + hour + ":" + minute);
+                                    } else if (hour == 12) {
+                                        mSystemTime.setText("下午" + hour + ":" + minute);
+                                    } else {
+                                        mSystemTime.setText("下午" + (hour - 12) + ":" + minute);
+                                    }
+                                } catch (ParseException e) {
                                     e.printStackTrace();
                                 }
-                                onCreate(null);
-                            }
-                        });
-                        dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        });
-                        dialog.show();
-                        return true;
-                    }
-                });
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(SearchAreaActivity.this, WeatherActivity.class);
-                        intent.putExtra("item", getIndex(cNList, county_name));
-                        startActivity(intent);
-                        addWeather(county_name, "value");
-                        finish();
-                    }
-                });
-                mSearchAreaItem.addView(view);
+                                TextView mCity = (TextView) view.findViewById(R.id.city);
+                                mCity.setText(county_name);
+                                if (!TextUtils.isEmpty(degree)) {
+                                    TextView mDegrees = (TextView) view.findViewById(R.id.degrees);
+                                    mDegrees.setText(degree);
+                                    setBackground(status, view);
+                                }
 
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-    }
+                                view.setOnLongClickListener(new View.OnLongClickListener() {
+                                    @Override
+                                    public boolean onLongClick(View v) {
+                                        AlertDialog.Builder dialog = new AlertDialog.Builder(SearchAreaActivity.this);
+                                        dialog.setCancelable(true);
+                                        dialog.setPositiveButton("删除", new DialogInterface.OnClickListener() {
+                                            @RequiresApi(api = Build.VERSION_CODES.N)
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                try {
+                                                    db.delete("Information", "county_name = ?", new String[]{county_name});
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                                showAllWeather();
+                                            }
+                                        });
+                                        dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                            }
+                                        });
+                                        dialog.show();
+                                        return true;
+                                    }
+                                });
+                                view.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent intent = new Intent(SearchAreaActivity.this, WeatherActivity.class);
+                                        intent.putExtra("item", getIndex(cNList, county_name));
+                                        startActivity(intent);
+                                        addWeather(county_name, "value");
+                                        finish();
+                                    }
+                                });
+                                mSearchAreaItem.addView(view);
 
-    public void addWeather(final String weatherId, final String value) {
-        String weatherUrl = "https://free-api.heweather.com/v5/weather?city=" +
-                weatherId + "&key=168d59faf85840c0b262b671067367e1";
-        HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String responseText = response.body().string();
-                final Weather weather = Utility.handleWeatherResponse(responseText);
-                runOnUiThread(new Runnable() {
-                    @RequiresApi(api = Build.VERSION_CODES.N)
-                    @Override
-                    public void run() {
-                        try {
-                            db.delete("Information", "county_name = ?", new String[]{weather.basic.city});
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            Toast.makeText(SearchAreaActivity.this, "城市获取失败，请换个城市", Toast.LENGTH_SHORT).show();
-                        }
-                        if (weather != null && "ok".equals(weather.status)) {
-                            ContentValues values = new ContentValues();
-                            values.clear();
-                            values.put("county_name", weather.basic.city);
-                            values.put("degree", weather.now.tmp);
-                            values.put("status", weather.now.cond.txt);
-                            db.insert("Information", null, values);
-                            if (TextUtils.isEmpty(value)) {
-                                Intent intent = new Intent(SearchAreaActivity.this, SearchAreaActivity.class);
-                                intent.putExtra("weather_id", "");
-                                startActivity(intent);
-                                finish();
-                            }
+                            } while (cursor.moveToNext());
                         }
                     }
-                });
-            }
-
-            @Override
-            public void onFailure(final Call call, IOException e) {
-                runOnUiThread(new Runnable() {
-                    @RequiresApi(api = Build.VERSION_CODES.N)
-                    @Override
-                    public void run() {
-                        String countyName = getIntent().getStringExtra("countyName");
-                        if (!TextUtils.isEmpty(countyName)) {
-                            try {
-                                db.delete("Information", "county_name = ?", new String[]{countyName});
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Toast.makeText(SearchAreaActivity.this, "城市获取失败，请换个城市", Toast.LENGTH_SHORT).show();
-                            }
-                            ContentValues values = new ContentValues();
-                            values.clear();
-                            values.put("county_name", countyName);
-                            db.insert("Information", null, values);
-                        }
-                        if (TextUtils.isEmpty(value)) {
-                            Intent intent = new Intent(SearchAreaActivity.this, SearchAreaActivity.class);
-                            intent.putExtra("weather_id", "");
-                            startActivity(intent);
-                            finish();
-                        }
+                    try {
+                        cursor.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-
-//                        Toast.makeText(SearchAreaActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
-
-                });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
 
-    public int Time(String string) {
-        String str = string;
-        String detailedTime = str.substring(11, 13);
-        return Integer.parseInt(detailedTime);
+    public void addWeather(final String weatherId, final String value) {
+        if (!TextUtils.isEmpty(weatherId)) {
+            String weatherUrl = URLSTART + weatherId + URLEND;
+            HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    final String responseText = response.body().string();
+                    final Weather weather = Utility.handleWeatherResponse(responseText);
+                    runOnUiThread(new Runnable() {
+                        @RequiresApi(api = Build.VERSION_CODES.N)
+                        @Override
+                        public void run() {
+                            try {
+                                db.delete("Information", "county_name = ?", new String[]{weather.basic.parent_city});
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                Toast.makeText(SearchAreaActivity.this, "城市获取失败，请换个城市", Toast.LENGTH_SHORT).show();
+                            }
+                            if (weather != null && "ok".equals(weather.status)) {
+                                ContentValues values = new ContentValues();
+                                values.clear();
+                                values.put("county_name", weather.basic.parent_city);
+                                values.put("degree", weather.now.tmp);
+                                values.put("status", weather.now.cond_txt);
+                                try {
+                                    db.insert("Information", null, values);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                if (TextUtils.isEmpty(value)) {
+                                    showAllWeather();
+                                }
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(final Call call, IOException e) {
+                    runOnUiThread(new Runnable() {
+                        @RequiresApi(api = Build.VERSION_CODES.N)
+                        @Override
+                        public void run() {
+                            String countyName = getIntent().getStringExtra("countyName");
+                            if (!TextUtils.isEmpty(countyName)) {
+                                try {
+                                    db.delete("Information", "county_name = ?", new String[]{countyName});
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                ContentValues values = new ContentValues();
+                                values.clear();
+                                values.put("county_name", countyName);
+                                try {
+                                    db.insert("Information", null, values);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            if (TextUtils.isEmpty(value)) {
+                                showAllWeather();
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    public static void setBackground(String string, View view) {
+        final String SUN = "晴";
+        final String OVERCAST = "阴";
+        final String CLOUDY = "多云";
+        final String LIGHT_RAIN = "小雨";
+        final String MODERATE_RAIN = "中雨";
+        final String HEAVY_RAIN = "大雨";
+        final String SHOWER_RAIN = "阵雨";
+        final String THUNDERSHOWER = "雷阵雨";
+        final String LIGHT_SNOW = "小雪";
+
+        switch (string) {
+
+            case SUN:
+                view.setBackgroundResource(R.drawable.ic_choose_sun_bg);
+                break;
+            case OVERCAST:
+                view.setBackgroundResource(R.drawable.ic_choose_overcast_bg);
+                break;
+            case CLOUDY:
+                view.setBackgroundResource(R.drawable.ic_choose_cloudy_bg);
+                break;
+            case LIGHT_RAIN:
+                view.setBackgroundResource(R.drawable.i_light_rain);
+                break;
+            case MODERATE_RAIN:
+                view.setBackgroundResource(R.drawable.i_moderate_rain);
+                break;
+            case HEAVY_RAIN:
+                view.setBackgroundResource(R.drawable.i_heavy_rain);
+                break;
+            case SHOWER_RAIN:
+                view.setBackgroundResource(R.drawable.i_shower_rain);
+                break;
+            case THUNDERSHOWER:
+                view.setBackgroundResource(R.drawable.i_thundershower);
+                break;
+            case LIGHT_SNOW:
+                view.setBackgroundResource(R.drawable.i_light_snow);
+                break;
+            default:
+                break;
+        }
     }
 
     public int getIndex(List<String> list, String string) {
-        for (int i = 0; i < list.size(); i++) {
-            if (string.equals(list.get(i))) {
-                return i;
+        try {
+            for (int i = 0; i < list.size(); i++) {
+                if (string.equals(list.get(i))) {
+                    return i;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return 1;
+        return 0;
+    }
+
+    private void showProgressDialog() {
+        if (progressDidog == null) {
+            progressDidog = new ProgressDialog(this);
+            progressDidog.setMessage("刷新界面...");
+            progressDidog.setCanceledOnTouchOutside(false);
+        }
+        progressDidog.show();
+    }
+
+    private void closeProgressDialog() {
+        if (progressDidog != null) {
+            progressDidog.dismiss();
+        }
     }
 }

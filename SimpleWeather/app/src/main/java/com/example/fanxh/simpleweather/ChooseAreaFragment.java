@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.fanxh.simpleweather.db.City;
 import com.example.fanxh.simpleweather.db.County;
+import com.example.fanxh.simpleweather.db.DbUtil;
 import com.example.fanxh.simpleweather.db.Province;
 import com.example.fanxh.simpleweather.db.SWDatabase;
 import com.example.fanxh.simpleweather.util.HttpUtil;
@@ -83,9 +84,7 @@ public class ChooseAreaFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.choose_area_fragment, container, false);
-//        swDatabase = new SWDatabase(getActivity(), "SimpleWeather.db", null, 2);
-        swDatabase = new SWDatabase(getActivity());
-        db = swDatabase.getWritableDatabase();
+        db = DbUtil.getDb(getActivity());
         mTitleText = (TextView) view.findViewById(R.id.title_text);
         mBackButton = (Button) view.findViewById(R.id.back_button);
         mShowArea = (ListView) view.findViewById(R.id.list_view);
@@ -140,7 +139,6 @@ public class ChooseAreaFragment extends Fragment {
         queryProvinces();
     }
 
-
     /**
      * 查询全国所有的省，优先从数据库里查询，如果没有查询到再去服务器上查询
      */
@@ -169,7 +167,7 @@ public class ChooseAreaFragment extends Fragment {
     /**
      * 查询选中的所有的市，优先从数据库中查询，如果没有查到再去服务器上查询
      */
-   public void queryCities() {
+    public void queryCities() {
         mTitleText.setText(selectedProvinceF);
         mBackButton.setVisibility(View.VISIBLE);
         Cursor cursor = db.query("Province", null, "province_name = ?", new String[]{selectedProvinceF}, null, null, null);
@@ -185,9 +183,19 @@ public class ChooseAreaFragment extends Fragment {
                         dataList.add(cityName);
                     } while (cursor.moveToNext());
                 }
-                mShowAreaAdapter.notifyDataSetChanged();
-                mShowArea.setSelection(0);
-                currentLevel = LEVEL_CITY;
+
+                if (dataList.size() != 1) {
+                    mShowAreaAdapter.notifyDataSetChanged();
+                    mShowArea.setSelection(0);
+                    currentLevel = LEVEL_CITY;
+                }else {
+                    if (cursor.moveToFirst()){
+                        String cityName = cursor.getString(cursor.getColumnIndex("city_name"));
+                        selectedCityF = cityName;
+                        queryCounties();
+                }
+
+                }
 
             } else {
                 String address = "http://guolin.tech/api/china/" + provinceCode;
@@ -200,7 +208,7 @@ public class ChooseAreaFragment extends Fragment {
     /**
      * 查询选中的市内的所有县，优先从数据库查询，如果没有查询到再去服务器上查询
      */
-    public void queryCounties() {
+    private void queryCounties() {
         mTitleText.setText(selectedCityF);
         mBackButton.setVisibility(View.VISIBLE);
 

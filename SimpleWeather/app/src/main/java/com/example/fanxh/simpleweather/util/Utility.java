@@ -8,7 +8,10 @@ import java.text.SimpleDateFormat;
 
 import android.os.Build;
 import android.text.TextUtils;
+import android.view.View;
+import android.widget.ImageView;
 
+import com.example.fanxh.simpleweather.R;
 import com.example.fanxh.simpleweather.gson.Weather;
 import com.google.gson.Gson;
 
@@ -111,7 +114,7 @@ public class Utility {
     public static Weather handleWeatherResponse(String response) {
         try {
             JSONObject jsonObject = new JSONObject(response);
-            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather5");
+            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather6");
             String weatherInformation = jsonArray.getJSONObject(0).toString();
             return (new Gson().fromJson(weatherInformation, Weather.class));
         } catch (Exception e) {
@@ -167,5 +170,50 @@ public class Utility {
             e.printStackTrace();
         }
         return mWeek;
+    }
+
+    public static void setImage(String string, ImageView imageView){
+        final String SUN = "晴";
+        final String OVERCAST = "阴";
+        final String CLOUDY = "多云";
+        final String LIGHT_RAIN = "小雨";
+        final String MODERATE_RAIN = "中雨";
+        final String HEAVY_RAIN = "大雨";
+        final String SHOWER_RAIN = "阵雨";
+        final String THUNDERSHOWER = "雷阵雨";
+        final String LIGHT_SNOW = "小雪";
+
+        switch (string) {
+
+            case SUN:
+                imageView.setImageResource(R.drawable.i_sun);
+                break;
+            case OVERCAST:
+                imageView.setImageResource(R.drawable.i_overcast);
+                break;
+            case CLOUDY:
+                imageView.setImageResource(R.drawable.i_cloudy);
+                break;
+            case LIGHT_RAIN:
+                imageView.setImageResource(R.drawable.i_light_rain);
+                break;
+            case MODERATE_RAIN:
+                imageView.setImageResource(R.drawable.i_moderate_rain);
+                break;
+            case HEAVY_RAIN:
+                imageView.setImageResource(R.drawable.i_heavy_rain);
+                break;
+            case SHOWER_RAIN:
+                imageView.setImageResource(R.drawable.i_shower_rain);
+                break;
+            case THUNDERSHOWER:
+                imageView.setImageResource(R.drawable.i_thundershower);
+                break;
+            case LIGHT_SNOW:
+                imageView.setImageResource(R.drawable.i_light_snow);
+                break;
+            default:
+                break;
+        }
     }
 }

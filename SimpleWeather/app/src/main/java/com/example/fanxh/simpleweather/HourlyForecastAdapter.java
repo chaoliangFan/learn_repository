@@ -7,7 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.fanxh.simpleweather.gson.HourlyForecast;
+import com.example.fanxh.simpleweather.gson.Hourly;
+import com.example.fanxh.simpleweather.util.Utility;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -20,7 +21,7 @@ import java.util.List;
 
 public class HourlyForecastAdapter extends RecyclerView.Adapter<HourlyForecastAdapter.ViewHolder> {
 
-    private List<HourlyForecast> mHourly_forecastList;
+    private List<Hourly> mHourly_forecastList;
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView mTime;
@@ -35,7 +36,7 @@ public class HourlyForecastAdapter extends RecyclerView.Adapter<HourlyForecastAd
         }
     }
 
-    public HourlyForecastAdapter(List<HourlyForecast> hourly_forecastList) {
+    public HourlyForecastAdapter(List<Hourly> hourly_forecastList) {
         mHourly_forecastList = hourly_forecastList;
     }
 
@@ -47,11 +48,11 @@ public class HourlyForecastAdapter extends RecyclerView.Adapter<HourlyForecastAd
     }
 
     public void onBindViewHolder(HourlyForecastAdapter.ViewHolder holder, int position) {
-        HourlyForecast mHourly_forecast = mHourly_forecastList.get(position);
+        Hourly mHourly_forecast = mHourly_forecastList.get(position);
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         try {
-            Date date = format.parse(mHourly_forecast.date);
+            Date date = format.parse(mHourly_forecast.time);
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -69,37 +70,7 @@ public class HourlyForecastAdapter extends RecyclerView.Adapter<HourlyForecastAd
         } catch (Exception e) {
             e.printStackTrace();
         }
-        switch (mHourly_forecast.cond.txt) {
-
-            case "晴":
-                holder.mStatus.setImageResource(R.drawable.i_sun);
-                break;
-            case "阴":
-                holder.mStatus.setImageResource(R.drawable.i_overcast);
-                break;
-            case "多云":
-                holder.mStatus.setImageResource(R.drawable.i_cloudy);
-                break;
-            case "小雨":
-                holder.mStatus.setImageResource(R.drawable.i_light_rain);
-                break;
-            case "中雨":
-                holder.mStatus.setImageResource(R.drawable.i_moderate_rain);
-                break;
-            case "大雨":
-                holder.mStatus.setImageResource(R.drawable.i_heavy_rain);
-                break;
-            case "阵雨":
-                holder.mStatus.setImageResource(R.drawable.i_shower_rain);
-                break;
-            case "雷阵雨":
-                holder.mStatus.setImageResource(R.drawable.i_thundershower);
-                break;
-            case "小雪":
-                holder.mStatus.setImageResource(R.drawable.i_light_snow);
-                break;
-            default:
-        }
+        Utility.setImage(mHourly_forecast.cond_txt,holder.mStatus);
 
         holder.mDegree.setText(mHourly_forecast.tmp + "°");
     }

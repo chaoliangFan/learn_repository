@@ -13,6 +13,7 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.example.fanxh.simpleweather.db.DbUtil;
 import com.example.fanxh.simpleweather.db.SWDatabase;
 import com.example.fanxh.simpleweather.util.Utility;
 
@@ -24,7 +25,6 @@ public class WeatherActivity extends FragmentActivity {
     private ImageView mChooseAreaRight;
     private ViewPager mShowAllWeather;
     private static List<ShowWeatherFragment> fragmentList;
-    private SWDatabase swDatabase;
     private static SQLiteDatabase db;
 
     @Override
@@ -32,9 +32,7 @@ public class WeatherActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
         Utility.ActivityCollector.addActivity(this);
-//        swDatabase = new SWDatabase(this, "SimpleWeather.db", null, 2);
-        swDatabase = new SWDatabase(this);
-        db = swDatabase.getWritableDatabase();
+        db = DbUtil.getDb(this);
         mWebLeft = (ImageView) findViewById(R.id.web_left);
         mChooseAreaRight = (ImageView) findViewById(R.id.choose_area_right);
         mWebLeft.setOnClickListener(new View.OnClickListener() {
@@ -56,18 +54,22 @@ public class WeatherActivity extends FragmentActivity {
         mShowAllWeather = (ViewPager) findViewById(R.id.show_all_weather);
         fragmentList = new ArrayList<>();
         fragmentList.clear();
-        Cursor cursor = db.query("Information", null, null, null, null, null, null);
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                do {
-                    String weatherId = cursor.getString(cursor.getColumnIndex("county_name"));
-                    ShowWeatherFragment sWF = ShowWeatherFragment.newInstance(weatherId);
-                    fragmentList.add(sWF);
-                } while (cursor.moveToNext());
-            }
-        }
         try {
-            cursor.close();
+            Cursor cursor = db.query("Information", null, null, null, null, null, null);
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    do {
+                        String weatherId = cursor.getString(cursor.getColumnIndex("county_name"));
+                        ShowWeatherFragment sWF = ShowWeatherFragment.newInstance(weatherId);
+                        fragmentList.add(sWF);
+                    } while (cursor.moveToNext());
+                }
+            }
+            try {
+                cursor.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

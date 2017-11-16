@@ -6,8 +6,5 @@ package com.example.fanxh.simpleweather.gson;
 
 public class Now {
     public String tmp;
-    public Cond cond;
-    public class Cond{
-        public String txt;
-    }
+    public String cond_txt;
 }

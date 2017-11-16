@@ -11,7 +11,6 @@ public class Weather {
     public AQI aqi;
     public Basic basic;
     public Now now;
-    public Suggestion suggestion;
     public List<DailyForecast> daily_forecast;
-    public List<HourlyForecast> hourly_forecast;
+    public List<Hourly> hourly;
 }

@@ -25,7 +25,7 @@ public class ChangeAreaActivity extends Activity {
         } else if (mCAFragment.currentLevel == LEVEL_CITY) {
             mCAFragment.queryProvinces();
         } else {
-            Intent intent = new Intent(ChangeAreaActivity.this, ChangeAreaActivity.class);
+            Intent intent = new Intent(ChangeAreaActivity.this, SearchAreaActivity.class);
             startActivity(intent);
             finish();
         }

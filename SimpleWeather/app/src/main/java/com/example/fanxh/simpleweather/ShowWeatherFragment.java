@@ -2,11 +2,14 @@ package com.example.fanxh.simpleweather;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +35,8 @@ import okhttp3.Response;
 
 
 public class ShowWeatherFragment extends Fragment {
-
+    private static final String URLSTART = "https://free-api.heweather.com/s6/weather?location=";
+    private static final String URLEND = "&key=168d59faf85840c0b262b671067367e1";
     private TextView mTitleCity;
     private TextView mTitleNowCond;
     private TextView mTitleNowDegree;
@@ -55,6 +59,7 @@ public class ShowWeatherFragment extends Fragment {
     private LinearLayout mDailyForecast;
     private Activity mAcitvity;
     private static HourlyForecastAdapter mHourlyForecastAdapter;
+    public String weatherId;
 
     public static ShowWeatherFragment newInstance(String weatherId) {
         ShowWeatherFragment sWF = new ShowWeatherFragment();
@@ -95,6 +100,18 @@ public class ShowWeatherFragment extends Fragment {
         mAirQualityValue = (TextView) view.findViewById(R.id.air_quality_value);
         mDailyForecast = (LinearLayout) view.findViewById(R.id.daily_forecast_item);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mAcitvity);
+        String weatherString = prefs.getString(weatherId, null);
+        if (!TextUtils.isEmpty(weatherString)) {
+            final Weather weather = Utility.handleWeatherResponse(weatherString);
+            if (weather != null && TextUtils.equals("ok", weather.status)) {
+                showWeatherInformation(weather);
+            }
+        } else {
+            requestWeather(weatherId, weatherId);
+            prefs.edit().clear();
+        }
+
         return view;
     }
 
@@ -103,130 +120,156 @@ public class ShowWeatherFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
-            String weatherId = args.getString("weatherId");
-            requestWeather(weatherId,weatherId);
+            weatherId = args.getString("weatherId");
         }
     }
 
     public void requestWeather(final String weatherId, final String countyName) {
-        String weatherUrl = "https://free-api.heweather.com/v5/weather?city=" +
-                weatherId + "&key=168d59faf85840c0b262b671067367e1";
-        HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String responseText = response.body().string();
-                final Weather weather = Utility.handleWeatherResponse(responseText);
-                mAcitvity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (weather != null && "ok".equals(weather.status)) {
-                            showWeatherInformation(weather);
-                        } else {
+        if (!TextUtils.isEmpty(weatherId)) {
+            String weatherUrl = URLSTART + weatherId + URLEND;
+            HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    final String responseText = response.body().string();
+                    final Weather weather = Utility.handleWeatherResponse(responseText);
+                    mAcitvity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (weather != null && TextUtils.equals("ok", weather.status)) {
+                                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mAcitvity).edit();
+                                editor.putString(weatherId, responseText);
+                                editor.apply();
+                                showWeatherInformation(weather);
+                            } else {
+                                Toast.makeText(getActivity(), "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    mAcitvity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTitleCity.setText(countyName);
                             Toast.makeText(getActivity(), "获取天气信息失败", Toast.LENGTH_SHORT).show();
                         }
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(Call call, IOException e) {
-                mAcitvity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mTitleCity.setText(countyName);
-                        Toast.makeText(getActivity(), "获取天气信息失败", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
+                    });
+                }
+            });
+        }
     }
 
     public void showWeatherInformation(Weather weather) {
-        mTitleCity.setText(weather.basic.city);
-        mTitleNowCond.setText(weather.now.cond.txt);
-        mTitleNowDegree.setText(weather.now.tmp + "°");
-        mTitleDate.setText("星期" + Utility.getWeek(weather.daily_forecast.get(0).date) + "  今天");
-        mTitleDegree.setText(weather.daily_forecast.get(0).tmp.max + "  " + weather.daily_forecast.get(0).tmp.min);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        mHourlyItem.setLayoutManager(layoutManager);
-        mHourlyForecastAdapter = new HourlyForecastAdapter(weather.hourly_forecast);
-
-        mHourlyItem.setAdapter(mHourlyForecastAdapter);
-
-        mDailyForecast.removeAllViews();
-        for (int i = 0; i < 3; i++) {
-            for (DailyForecast mDaily_forecast : weather.daily_forecast) {
-                View view = LayoutInflater.from(mAcitvity).inflate(R.layout.daily_forecast_item, mDailyForecast, false);
-                TextView mDailyDate = (TextView) view.findViewById(R.id.daily_date);
-                ImageView mDailyStatus = (ImageView) view.findViewById(R.id.daily_status);
-                TextView mDailyDegree = (TextView) view.findViewById(R.id.daily_degree);
-                String mDailyTmpMax = mDaily_forecast.tmp.max;
-                mDailyDate.setText("星期" + Utility.getWeek(mDaily_forecast.date));
-                switch (mDaily_forecast.cond.txt_d) {
-
-                    case "晴":
-                        mDailyStatus.setImageResource(R.drawable.i_sun);
-                        break;
-                    case "阴":
-                        mDailyStatus.setImageResource(R.drawable.i_overcast);
-                        break;
-                    case "多云":
-                        mDailyStatus.setImageResource(R.drawable.i_cloudy);
-                        break;
-                    case "小雨":
-                        mDailyStatus.setImageResource(R.drawable.i_light_rain);
-                        break;
-                    case "中雨":
-                        mDailyStatus.setImageResource(R.drawable.i_moderate_rain);
-                        break;
-                    case "大雨":
-                        mDailyStatus.setImageResource(R.drawable.i_heavy_rain);
-                        break;
-                    case "阵雨":
-                        mDailyStatus.setImageResource(R.drawable.i_shower_rain);
-                        break;
-                    case "雷阵雨":
-                        mDailyStatus.setImageResource(R.drawable.i_thundershower);
-                        break;
-                    case "小雪":
-                        mDailyStatus.setImageResource(R.drawable.i_light_snow);
-                        break;
-                    default:
-                }
-                mDailyDegree.setText(mDailyTmpMax + "  " + mDaily_forecast.tmp.min);
-                mDailyForecast.addView(view);
+        if (weather != null) {
+            if (weather.basic != null && !TextUtils.isEmpty(weather.basic.parent_city)) {
+                mTitleCity.setText(weather.basic.parent_city);
             }
-
-        }
-        mWeatherDescribe.setText("今天: 当前" + weather.now.cond.txt + "。 最高气温" + weather.daily_forecast.get(0).tmp.max + "°。 今晚" + weather.daily_forecast.get(0).cond.txt_n + "， 最低气温" + weather.daily_forecast.get(0).tmp.min + "。");
-        if (Time(weather.daily_forecast.get(0).astro.sr) < 12) {
-            mSunriseValue.setText("上午" + weather.daily_forecast.get(0).astro.sr.substring(1, 5));
-        }
-        if (Time(weather.daily_forecast.get(0).astro.ss) > 12) {
-            mSunsetValue.setText("下午" + Integer.toString(Time(weather.daily_forecast.get(0).astro.ss) - 12) + weather.daily_forecast.get(0).astro.ss.substring(2, 5));
-        }
-        mRainfallProbabilityValue.setText(weather.daily_forecast.get(0).pcpn + "%");
-        mHumidityValue.setText(weather.daily_forecast.get(0).hum + "%");
-        mAirSpeedValue.setText(weather.daily_forecast.get(0).wind.dir + " " + "每秒" + Math.round(Integer.parseInt(weather.daily_forecast.get(0).wind.spd) / 3.6) + "米");
-        //体感温度
+            if (weather.now != null && !TextUtils.isEmpty(weather.now.cond_txt)) {
+                mTitleNowCond.setText(weather.now.cond_txt);
+            }
+            if (weather.now != null && TextUtils.isEmpty(weather.now.tmp)) {
+                mTitleNowDegree.setText(weather.now.tmp + "°");
+            }
+            if (weather.daily_forecast != null) {
+                if (weather.daily_forecast.size() != 0 && weather.daily_forecast.get(0) != null) {
+                    if (!TextUtils.isEmpty(weather.daily_forecast.get(0).date)) {
+                        mTitleDate.setText("星期" + Utility.getWeek(weather.daily_forecast.get(0).date) + "  今天");
+                    }
+                    if (!TextUtils.isEmpty(weather.daily_forecast.get(0).tmp_max) && !TextUtils.isEmpty(weather.daily_forecast.get(0).tmp_min)) {
+                        mTitleDegree.setText(weather.daily_forecast.get(0).tmp_max + "  " + weather.daily_forecast.get(0).tmp_min);
+                    }
+                }
+            }
+            LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+            layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+            mHourlyItem.setLayoutManager(layoutManager);
+            if (weather.hourly != null) {
+                mHourlyForecastAdapter = new HourlyForecastAdapter(weather.hourly);
+                mHourlyItem.setAdapter(mHourlyForecastAdapter);
+            }
+            mDailyForecast.removeAllViews();
+            if (weather.daily_forecast != null) {
+                for (int i = 0; i < 3; i++) {
+                    for (DailyForecast mDaily_forecast : weather.daily_forecast) {
+                        View view = LayoutInflater.from(mAcitvity).inflate(R.layout.daily_forecast_item, mDailyForecast, false);
+                        TextView mDailyDate = (TextView) view.findViewById(R.id.daily_date);
+                        ImageView mDailyStatus = (ImageView) view.findViewById(R.id.daily_status);
+                        TextView mDailyDegree = (TextView) view.findViewById(R.id.daily_degree);
+                        String mDailyTmpMax = mDaily_forecast.tmp_max;
+                        if (!TextUtils.isEmpty(mDaily_forecast.date)) {
+                            mDailyDate.setText("星期" + Utility.getWeek(mDaily_forecast.date));
+                        }
+                        if (!TextUtils.isEmpty(mDaily_forecast.cond_txt_d)) {
+                            Utility.setImage(mDaily_forecast.cond_txt_d, mDailyStatus);
+                        }
+                        if (!TextUtils.isEmpty(mDailyTmpMax) && !TextUtils.isEmpty(mDaily_forecast.tmp_min)) {
+                            mDailyDegree.setText(mDailyTmpMax + "  " + mDaily_forecast.tmp_min);
+                        }
+                        mDailyForecast.addView(view);
+                    }
+                }
+            }
+            if (weather.now != null && !TextUtils.isEmpty(weather.now.cond_txt)) {
+                if (weather.daily_forecast != null && weather.daily_forecast.get(0) != null && !TextUtils.isEmpty(weather.daily_forecast.get(0).tmp_max)) {
+                    mWeatherDescribe.setText("今天: 当前" + weather.now.cond_txt + "。 最高气温" + weather.daily_forecast.get(0).tmp_max + "°。 今晚" + weather.daily_forecast.get(0).cond_txt_n + "， 最低气温" + weather.daily_forecast.get(0).tmp_min + "。");
+                }
+            }
+            if (weather.daily_forecast.get(0).sr.length() == 5 && weather.daily_forecast.get(0).ss.length() == 5) {
+                if (Time(weather.daily_forecast.get(0).sr) < 12) {
+                    mSunriseValue.setText("上午" + weather.daily_forecast.get(0).sr.substring(1, 5));
+                }
+                if (Time(weather.daily_forecast.get(0).ss) > 12) {
+                    mSunsetValue.setText("下午" + Integer.toString(Time(weather.daily_forecast.get(0).ss) - 12) + weather.daily_forecast.get(0).ss.substring(2, 5));
+                }
+            }
+            if (weather.daily_forecast != null && weather.daily_forecast.get(0) != null) {
+                if (!TextUtils.isEmpty(weather.daily_forecast.get(0).pcpn)) {
+                    mRainfallProbabilityValue.setText(weather.daily_forecast.get(0).pcpn + "%");
+                }
+                if (!TextUtils.isEmpty(weather.daily_forecast.get(0).hum)) {
+                    mHumidityValue.setText(weather.daily_forecast.get(0).hum + "%");
+                }
+                if (!TextUtils.isEmpty(weather.daily_forecast.get(0).wind_dir) && !TextUtils.isEmpty(weather.daily_forecast.get(0).wind_spd)) {
+                    mAirSpeedValue.setText(weather.daily_forecast.get(0).wind_dir + " " + "每秒" + Math.round(Integer.parseInt(weather.daily_forecast.get(0).wind_spd) / 3.6) + "米");
+                }
+                //体感温度
 //        mSendibleTemperatureValue;
-        mPrecipitationValue.setText(weather.daily_forecast.get(0).pop + "毫米");
-        mAirPressureValue.setText(weather.daily_forecast.get(0).pres + "百帕");
-        mVisibilityValue.setText(weather.daily_forecast.get(0).vis + "公里");
-        mUltravioletIndexValue.setText(weather.daily_forecast.get(0).uv);
-        try {
-            mAQIValue.setText(weather.aqi.city.aqi);
-            mAirQualityValue.setText(weather.aqi.city.qlty);
-        } catch (Exception e) {
-            mAQIValue.setText("无");
-            mAirQualityValue.setText("无");
+                if (!TextUtils.isEmpty(weather.daily_forecast.get(0).pop)) {
+                    mPrecipitationValue.setText(weather.daily_forecast.get(0).pop + "毫米");
+                }
+                if (!TextUtils.isEmpty(weather.daily_forecast.get(0).pres)) {
+                    mAirPressureValue.setText(weather.daily_forecast.get(0).pres + "百帕");
+                }
+                if (!TextUtils.isEmpty(weather.daily_forecast.get(0).vis)) {
+                    mVisibilityValue.setText(weather.daily_forecast.get(0).vis + "公里");
+                }
+                if (!TextUtils.isEmpty(weather.daily_forecast.get(0).uv_index)) {
+                    mUltravioletIndexValue.setText(weather.daily_forecast.get(0).uv_index);
+                }
+            }
+            try {
+                mAQIValue.setText(weather.aqi.city.aqi);
+                mAirQualityValue.setText(weather.aqi.city.qlty);
+            } catch (Exception e) {
+                mAQIValue.setText("无");
+                mAirQualityValue.setText("无");
+            }
         }
     }
 
     public int Time(String string) {
-        String str = string;
-        String detailedTime = str.substring(0, 2);
-        return Integer.parseInt(detailedTime);
+        if (!TextUtils.isEmpty(string)) {
+            if (string.length() > 4) {
+                try {
+                    String detailedTime = string.substring(0, 2);
+                    return Integer.parseInt(detailedTime);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return 0;
     }
 }

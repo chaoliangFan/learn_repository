@@ -14,28 +14,17 @@ public class DailyForecast {
     //气压
     public String pres;
     //紫外线能指数
-    public String uv;
+    public String uv_index;
     //能见度
     public String vis;
     public String date;
-    public Astro astro;
-    public Cond cond;
-    public Tmp tmp;
-    public Wind wind;
-    public class Astro{
-        public String sr;
-        public String ss;
-    }
-    public  class Cond{
-        public String txt_d;
-        public String txt_n;
-    }
-    public class Tmp{
-        public String max;
-        public String min;
-    }
-    public class Wind {
-        public String dir;
-        public String spd;
-    }
+    public String sr;
+    public String ss;
+    public String cond_txt_d;
+    public String cond_txt_n;
+    public String tmp_max;
+    public String tmp_min;
+    public String wind_dir;
+    public String wind_spd;
+
 }

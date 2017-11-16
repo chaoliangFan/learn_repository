@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 
 public class SWDatabase extends SQLiteOpenHelper {
+    public static SWDatabase swDatabase;
     private final static String DATABASE_NAME="SimpleWeather.db";
     private final static int VERSION=1;
     public static final String CREATE_PROVINCE = "create table Province("
@@ -31,8 +32,19 @@ public class SWDatabase extends SQLiteOpenHelper {
             +"status text,"
             +"degree text)";
 
-    public SWDatabase(Context context) {
-        super(context, DATABASE_NAME, null, VERSION);
+    public SWDatabase(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+        super(context, name, factory, version);
+    }
+
+//    public SWDatabase(Context context) {
+//        super(context, DATABASE_NAME, null, VERSION);
+//    }
+
+    static synchronized SWDatabase getDBInstance(Context context) {
+        if (swDatabase == null) {
+            swDatabase = new SWDatabase(context,DATABASE_NAME,null,VERSION);
+        }
+        return swDatabase;
     }
 
     @Override
