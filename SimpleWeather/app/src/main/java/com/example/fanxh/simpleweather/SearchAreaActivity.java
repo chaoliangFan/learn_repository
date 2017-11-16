@@ -76,8 +76,6 @@ public class SearchAreaActivity extends Activity {
             }
         });
         String weatherId = getIntent().getStringExtra("weather_id");
-//        String weatherId = getIntent().getStringExtra("countyName");
-        Log.d("AAAAAAAAAA","weatherId--->"+weatherId);
         if (!TextUtils.isEmpty(weatherId)) {
             showProgressDialog();
             addWeather(weatherId, "");

@@ -9,6 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import com.example.fanxh.simpleweather.db.DbUtil;
 import com.example.fanxh.simpleweather.db.SWDatabase;
 
+import static com.example.fanxh.simpleweather.ChooseAreaFragment.LEVEL_CITY;
+import static com.example.fanxh.simpleweather.ChooseAreaFragment.LEVEL_COUNTY;
+
 public class MainActivity extends AppCompatActivity {
     private static SQLiteDatabase db;
 
@@ -34,6 +37,16 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    public void onBackPressed() {
+        ChooseAreaFragment mCAFragment = (ChooseAreaFragment) getFragmentManager().findFragmentById(R.id.choose_area_fragment);
+        if (mCAFragment.currentLevel == LEVEL_COUNTY) {
+            mCAFragment.queryCities();
+        } else if (mCAFragment.currentLevel == LEVEL_CITY) {
+            mCAFragment.queryProvinces();
+        } else {
+            super.onBackPressed();
         }
     }
 }
