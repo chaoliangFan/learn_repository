@@ -139,40 +139,42 @@ public class Utility {
 
     @TargetApi(Build.VERSION_CODES.N)
     public static String getWeek(String pTime) {
-        String mWeek = "";
+        String week = "";
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Calendar c = Calendar.getInstance();
-        try {
-            c.setTime(format.parse(pTime));
-            if (c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
-                mWeek += "日";
+        if (!TextUtils.isEmpty(pTime)) {
+            try {
+                c.setTime(format.parse(pTime));
+                if (c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+                    week += "日";
+                }
+                if (c.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+                    week += "一";
+                }
+                if (c.get(Calendar.DAY_OF_WEEK) == Calendar.TUESDAY) {
+                    week += "二";
+                }
+                if (c.get(Calendar.DAY_OF_WEEK) == Calendar.WEDNESDAY) {
+                    week += "三";
+                }
+                if (c.get(Calendar.DAY_OF_WEEK) == Calendar.THURSDAY) {
+                    week += "四";
+                }
+                if (c.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) {
+                    week += "五";
+                }
+                if (c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
+                    week += "六";
+                }
+            } catch (Exception e) {
+                week += "非日期或格式有误";
+                e.printStackTrace();
             }
-            if (c.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-                mWeek += "一";
-            }
-            if (c.get(Calendar.DAY_OF_WEEK) == Calendar.TUESDAY) {
-                mWeek += "二";
-            }
-            if (c.get(Calendar.DAY_OF_WEEK) == Calendar.WEDNESDAY) {
-                mWeek += "三";
-            }
-            if (c.get(Calendar.DAY_OF_WEEK) == Calendar.THURSDAY) {
-                mWeek += "四";
-            }
-            if (c.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) {
-                mWeek += "五";
-            }
-            if (c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
-                mWeek += "六";
-            }
-        } catch (Exception e) {
-            mWeek += "非日期或格式有误";
-            e.printStackTrace();
         }
-        return mWeek;
+            return week;
     }
 
-    public static void setImage(String string, ImageView imageView){
+    public static void setImage(String string, ImageView imageView) {
         final String SUN = "晴";
         final String OVERCAST = "阴";
         final String CLOUDY = "多云";
@@ -182,38 +184,39 @@ public class Utility {
         final String SHOWER_RAIN = "阵雨";
         final String THUNDERSHOWER = "雷阵雨";
         final String LIGHT_SNOW = "小雪";
+        if (!TextUtils.isEmpty(string) && imageView != null) {
+            switch (string) {
 
-        switch (string) {
-
-            case SUN:
-                imageView.setImageResource(R.drawable.i_sun);
-                break;
-            case OVERCAST:
-                imageView.setImageResource(R.drawable.i_overcast);
-                break;
-            case CLOUDY:
-                imageView.setImageResource(R.drawable.i_cloudy);
-                break;
-            case LIGHT_RAIN:
-                imageView.setImageResource(R.drawable.i_light_rain);
-                break;
-            case MODERATE_RAIN:
-                imageView.setImageResource(R.drawable.i_moderate_rain);
-                break;
-            case HEAVY_RAIN:
-                imageView.setImageResource(R.drawable.i_heavy_rain);
-                break;
-            case SHOWER_RAIN:
-                imageView.setImageResource(R.drawable.i_shower_rain);
-                break;
-            case THUNDERSHOWER:
-                imageView.setImageResource(R.drawable.i_thundershower);
-                break;
-            case LIGHT_SNOW:
-                imageView.setImageResource(R.drawable.i_light_snow);
-                break;
-            default:
-                break;
+                case SUN:
+                    imageView.setImageResource(R.drawable.i_sun);
+                    break;
+                case OVERCAST:
+                    imageView.setImageResource(R.drawable.i_overcast);
+                    break;
+                case CLOUDY:
+                    imageView.setImageResource(R.drawable.i_cloudy);
+                    break;
+                case LIGHT_RAIN:
+                    imageView.setImageResource(R.drawable.i_light_rain);
+                    break;
+                case MODERATE_RAIN:
+                    imageView.setImageResource(R.drawable.i_moderate_rain);
+                    break;
+                case HEAVY_RAIN:
+                    imageView.setImageResource(R.drawable.i_heavy_rain);
+                    break;
+                case SHOWER_RAIN:
+                    imageView.setImageResource(R.drawable.i_shower_rain);
+                    break;
+                case THUNDERSHOWER:
+                    imageView.setImageResource(R.drawable.i_thundershower);
+                    break;
+                case LIGHT_SNOW:
+                    imageView.setImageResource(R.drawable.i_light_snow);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

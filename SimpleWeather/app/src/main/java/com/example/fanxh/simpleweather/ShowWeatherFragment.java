@@ -163,23 +163,13 @@ public class ShowWeatherFragment extends Fragment {
 
     public void showWeatherInformation(Weather weather) {
         if (weather != null) {
-            if (weather.basic != null && !TextUtils.isEmpty(weather.basic.parent_city)) {
+            mAQIValue.setText("无");
+            mAirQualityValue.setText("无");
+            if (weather.basic != null) {
                 mTitleCity.setText(weather.basic.parent_city);
-            }
-            if (weather.now != null && !TextUtils.isEmpty(weather.now.cond_txt)) {
                 mTitleNowCond.setText(weather.now.cond_txt);
-            }
-            if (weather.now != null && TextUtils.isEmpty(weather.now.tmp)) {
-                mTitleNowDegree.setText(weather.now.tmp + "°");
-            }
-            if (weather.daily_forecast != null) {
-                if (weather.daily_forecast.size() != 0 && weather.daily_forecast.get(0) != null) {
-                    if (!TextUtils.isEmpty(weather.daily_forecast.get(0).date)) {
-                        mTitleDate.setText("星期" + Utility.getWeek(weather.daily_forecast.get(0).date) + "  今天");
-                    }
-                    if (!TextUtils.isEmpty(weather.daily_forecast.get(0).tmp_max) && !TextUtils.isEmpty(weather.daily_forecast.get(0).tmp_min)) {
-                        mTitleDegree.setText(weather.daily_forecast.get(0).tmp_max + "  " + weather.daily_forecast.get(0).tmp_min);
-                    }
+                if (!TextUtils.isEmpty(weather.now.tmp)) {
+                    mTitleNowDegree.setText(weather.now.tmp + "°");
                 }
             }
             LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -189,8 +179,9 @@ public class ShowWeatherFragment extends Fragment {
                 mHourlyForecastAdapter = new HourlyForecastAdapter(weather.hourly);
                 mHourlyItem.setAdapter(mHourlyForecastAdapter);
             }
-            mDailyForecast.removeAllViews();
-            if (weather.daily_forecast != null) {
+            if (weather.daily_forecast != null && weather.daily_forecast.size() != 0 && weather.daily_forecast.get(0) != null) {
+                DailyForecast dailyForecast = weather.daily_forecast.get(0);
+                mDailyForecast.removeAllViews();
                 for (int i = 0; i < 3; i++) {
                     for (DailyForecast mDaily_forecast : weather.daily_forecast) {
                         View view = LayoutInflater.from(mAcitvity).inflate(R.layout.daily_forecast_item, mDailyForecast, false);
@@ -209,52 +200,45 @@ public class ShowWeatherFragment extends Fragment {
                         }
                         mDailyForecast.addView(view);
                     }
+                    mTitleDegree.setText(dailyForecast.tmp_max + "  " + dailyForecast.tmp_min);
+                    if (!TextUtils.isEmpty(dailyForecast.date)) {
+                        mTitleDate.setText("星期" + Utility.getWeek(dailyForecast.date) + "  今天");
+                    }
+                    if (weather.now != null && !TextUtils.isEmpty(weather.now.cond_txt) && !TextUtils.isEmpty(dailyForecast.tmp_max)) {
+                        mWeatherDescribe.setText("今天: 当前" + weather.now.cond_txt + "。 最高气温" + dailyForecast.tmp_max + "°。 今晚" + dailyForecast.cond_txt_n + "， 最低气温" + dailyForecast.tmp_min + "。");
+                    }
+                    if (dailyForecast.sr.length() == 5 && dailyForecast.ss.length() == 5) {
+                        if (Time(dailyForecast.sr) < 12) {
+                            mSunriseValue.setText("上午" + dailyForecast.sr.substring(1, 5));
+                        }
+                        if (Time(dailyForecast.ss) > 12) {
+                            mSunsetValue.setText("下午" + Integer.toString(Time(dailyForecast.ss) - 12) + dailyForecast.ss.substring(2, 5));
+                        }
+                    }
+                    if (!TextUtils.isEmpty(dailyForecast.pcpn)) {
+                        mRainfallProbabilityValue.setText(weather.daily_forecast.get(0).pcpn + "%");
+                    }
+                    if (!TextUtils.isEmpty(dailyForecast.hum)) {
+                        mHumidityValue.setText(dailyForecast.hum + "%");
+                    }
+                    if (!TextUtils.isEmpty(dailyForecast.wind_dir) && !TextUtils.isEmpty(dailyForecast.wind_spd)) {
+                        mAirSpeedValue.setText(dailyForecast.wind_dir + " " + "每秒" + Math.round(Integer.parseInt(dailyForecast.wind_spd) / 3.6) + "米");
+                    }
+                    //         体感温度
+                    //        mSendibleTemperatureValue;
+                    if (!TextUtils.isEmpty(dailyForecast.pop)) {
+                        mPrecipitationValue.setText(dailyForecast.pop + "毫米");
+                    }
+                    if (!TextUtils.isEmpty(dailyForecast.pres)) {
+                        mAirPressureValue.setText(dailyForecast.pres + "百帕");
+                    }
+                    if (!TextUtils.isEmpty(dailyForecast.vis)) {
+                        mVisibilityValue.setText(dailyForecast.vis + "公里");
+                    }
+                    if (!TextUtils.isEmpty(dailyForecast.uv_index)) {
+                        mUltravioletIndexValue.setText(dailyForecast.uv_index);
+                    }
                 }
-            }
-            if (weather.now != null && !TextUtils.isEmpty(weather.now.cond_txt)) {
-                if (weather.daily_forecast != null && weather.daily_forecast.get(0) != null && !TextUtils.isEmpty(weather.daily_forecast.get(0).tmp_max)) {
-                    mWeatherDescribe.setText("今天: 当前" + weather.now.cond_txt + "。 最高气温" + weather.daily_forecast.get(0).tmp_max + "°。 今晚" + weather.daily_forecast.get(0).cond_txt_n + "， 最低气温" + weather.daily_forecast.get(0).tmp_min + "。");
-                }
-            }
-            if (weather.daily_forecast.get(0).sr.length() == 5 && weather.daily_forecast.get(0).ss.length() == 5) {
-                if (Time(weather.daily_forecast.get(0).sr) < 12) {
-                    mSunriseValue.setText("上午" + weather.daily_forecast.get(0).sr.substring(1, 5));
-                }
-                if (Time(weather.daily_forecast.get(0).ss) > 12) {
-                    mSunsetValue.setText("下午" + Integer.toString(Time(weather.daily_forecast.get(0).ss) - 12) + weather.daily_forecast.get(0).ss.substring(2, 5));
-                }
-            }
-            if (weather.daily_forecast != null && weather.daily_forecast.get(0) != null) {
-                if (!TextUtils.isEmpty(weather.daily_forecast.get(0).pcpn)) {
-                    mRainfallProbabilityValue.setText(weather.daily_forecast.get(0).pcpn + "%");
-                }
-                if (!TextUtils.isEmpty(weather.daily_forecast.get(0).hum)) {
-                    mHumidityValue.setText(weather.daily_forecast.get(0).hum + "%");
-                }
-                if (!TextUtils.isEmpty(weather.daily_forecast.get(0).wind_dir) && !TextUtils.isEmpty(weather.daily_forecast.get(0).wind_spd)) {
-                    mAirSpeedValue.setText(weather.daily_forecast.get(0).wind_dir + " " + "每秒" + Math.round(Integer.parseInt(weather.daily_forecast.get(0).wind_spd) / 3.6) + "米");
-                }
-                //体感温度
-//        mSendibleTemperatureValue;
-                if (!TextUtils.isEmpty(weather.daily_forecast.get(0).pop)) {
-                    mPrecipitationValue.setText(weather.daily_forecast.get(0).pop + "毫米");
-                }
-                if (!TextUtils.isEmpty(weather.daily_forecast.get(0).pres)) {
-                    mAirPressureValue.setText(weather.daily_forecast.get(0).pres + "百帕");
-                }
-                if (!TextUtils.isEmpty(weather.daily_forecast.get(0).vis)) {
-                    mVisibilityValue.setText(weather.daily_forecast.get(0).vis + "公里");
-                }
-                if (!TextUtils.isEmpty(weather.daily_forecast.get(0).uv_index)) {
-                    mUltravioletIndexValue.setText(weather.daily_forecast.get(0).uv_index);
-                }
-            }
-            try {
-                mAQIValue.setText(weather.aqi.city.aqi);
-                mAirQualityValue.setText(weather.aqi.city.qlty);
-            } catch (Exception e) {
-                mAQIValue.setText("无");
-                mAirQualityValue.setText("无");
             }
         }
     }
@@ -267,6 +251,7 @@ public class ShowWeatherFragment extends Fragment {
                     return Integer.parseInt(detailedTime);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    return 0;
                 }
             }
         }

@@ -157,10 +157,10 @@ public class ChooseAreaFragment extends Fragment {
             Cursor cursor = db.query("Province", null, null, null, null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 dataList.clear();
-                    do {
-                        String provinceName = cursor.getString(cursor.getColumnIndex("province_name"));
-                        dataList.add(provinceName);
-                    } while (cursor.moveToNext());
+                do {
+                    String provinceName = cursor.getString(cursor.getColumnIndex("province_name"));
+                    dataList.add(provinceName);
+                } while (cursor.moveToNext());
 
                 mShowAreaAdapter.notifyDataSetChanged();
                 mShowArea.setSelection(0);
@@ -192,11 +192,11 @@ public class ChooseAreaFragment extends Fragment {
                 try {
                     cursor = db.query("City", null, "province_id = ?", new String[]{"" + provinceCode}, null, null, null);
                     if (cursor != null && cursor.moveToFirst()) {
-                            dataList.clear();
-                            do {
-                                String cityName = cursor.getString(cursor.getColumnIndex("city_name"));
-                                dataList.add(cityName);
-                            } while (cursor.moveToNext());
+                        dataList.clear();
+                        do {
+                            String cityName = cursor.getString(cursor.getColumnIndex("city_name"));
+                            dataList.add(cityName);
+                        } while (cursor.moveToNext());
                         if (dataList.size() != 1) {
                             mShowAreaAdapter.notifyDataSetChanged();
                             mShowArea.setSelection(0);
@@ -241,13 +241,13 @@ public class ChooseAreaFragment extends Fragment {
                     cursor = db.query("County", null, "city_id = ?", new String[]{"" + cityCode}, null, null, null);
                     if (cursor != null && cursor.moveToFirst()) {
                         dataList.clear();
-                            do {
-                                String countyName = cursor.getString(cursor.getColumnIndex("county_name"));
-                                dataList.add(countyName);
-                            } while (cursor.moveToNext());
-                            mShowAreaAdapter.notifyDataSetChanged();
-                            mShowArea.setSelection(0);
-                            currentLevel = LEVEL_COUNTY;
+                        do {
+                            String countyName = cursor.getString(cursor.getColumnIndex("county_name"));
+                            dataList.add(countyName);
+                        } while (cursor.moveToNext());
+                        mShowAreaAdapter.notifyDataSetChanged();
+                        mShowArea.setSelection(0);
+                        currentLevel = LEVEL_COUNTY;
                     } else {
                         try {
                             Cursor cursor1 = db.query("City", null, "city_name = ?", new String[]{selectedCityF}, null, null, null);
