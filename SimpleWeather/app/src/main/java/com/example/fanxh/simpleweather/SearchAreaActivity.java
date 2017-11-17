@@ -15,15 +15,11 @@ import android.os.Message;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.fanxh.simpleweather.db.DbUtil;
 import com.example.fanxh.simpleweather.gson.Weather;
@@ -31,11 +27,7 @@ import com.example.fanxh.simpleweather.util.HttpUtil;
 import com.example.fanxh.simpleweather.util.Utility;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import okhttp3.Call;
@@ -222,6 +214,7 @@ public class SearchAreaActivity extends Activity {
                                 values.put("county_name", weather.basic.location);
                                 values.put("degree", weather.now.tmp);
                                 values.put("status", weather.now.cond_txt);
+                                values.put("weatherString",responseText);
                                 try {
                                     db.insert("Information", null, values);
                                 } catch (Exception e) {

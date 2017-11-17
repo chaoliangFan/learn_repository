@@ -1,10 +1,14 @@
 package com.example.fanxh.simpleweather;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.fanxh.simpleweather.db.DbUtil;
 import com.example.fanxh.simpleweather.gson.DailyForecast;
 import com.example.fanxh.simpleweather.gson.Weather;
 import com.example.fanxh.simpleweather.util.HttpUtil;
@@ -42,6 +47,7 @@ import okhttp3.Response;
 public class ShowWeatherFragment extends Fragment {
     private static final String URLSTART = "https://free-api.heweather.com/s6/weather?location=";
     private static final String URLEND = "&key=168d59faf85840c0b262b671067367e1";
+    private static final int SUCCESS = 1;
     private TextView mTitleCity;
     private TextView mTitleNowCond;
     private TextView mTitleNowDegree;
@@ -63,13 +69,24 @@ public class ShowWeatherFragment extends Fragment {
     private TextView mAirQualityValue;
     private LinearLayout mDailyForecast;
 
-    private Button mLinkedNetwork;
+    private static Weather weather;
+    private ProgressDialog progressDidog;
+    private Button mWeatherReflesh;
     private LinearLayout mFragmentView;
     private LinearLayout mWeatherFragment;
-
+    private static SQLiteDatabase db;
+    private Cursor cursor;
     private Activity mAcitvity;
     private static HourlyForecastAdapter mHourlyForecastAdapter;
     public String weatherId;
+    private Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case SUCCESS:
+                    setWeatherInformation(weather);
+            }
+        }
+    };
 
     public static ShowWeatherFragment newInstance(String weatherId) {
         ShowWeatherFragment sWF = new ShowWeatherFragment();
@@ -89,10 +106,9 @@ public class ShowWeatherFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.show_weather_fragment, container, false);
 
-        mLinkedNetwork = (Button) view.findViewById(R.id.linkde_network);
+        mWeatherReflesh = (Button) view.findViewById(R.id.weather_reflesh);
         mFragmentView = (LinearLayout) view.findViewById(R.id.fragment_view);
         mWeatherFragment = (LinearLayout) view.findViewById(R.id.weather_fragment);
-
         mTitleCity = (TextView) view.findViewById(R.id.title_city);
         mTitleDate = (TextView) view.findViewById(R.id.title_date);
         mTitleDegree = (TextView) view.findViewById(R.id.title_degree);
@@ -113,21 +129,15 @@ public class ShowWeatherFragment extends Fragment {
         mAQIValue = (TextView) view.findViewById(R.id.aqi_value);
         mAirQualityValue = (TextView) view.findViewById(R.id.air_quality_value);
         mDailyForecast = (LinearLayout) view.findViewById(R.id.daily_forecast_item);
-
-        mLinkedNetwork.setVisibility(View.GONE);
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mAcitvity);
-        String weatherString = prefs.getString(weatherId, null);
-        if (!TextUtils.isEmpty(weatherString)) {
-            final Weather weather = Utility.handleWeatherResponse(weatherString);
-            if (weather != null && TextUtils.equals("ok", weather.status)) {
-                showWeatherInformation(weather);
+        mWeatherFragment.setVisibility(View.GONE);
+        mWeatherReflesh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showProgressDialog();
+                requestWeather(weatherId, weatherId);
             }
-        } else {
-            requestWeather(weatherId, weatherId);
-            prefs.edit().clear();
-        }
-
+        });
+        showWeatherInformation();
         return view;
     }
 
@@ -140,6 +150,41 @@ public class ShowWeatherFragment extends Fragment {
         }
     }
 
+    public void showWeatherInformation() {
+        db = DbUtil.getDb(getActivity());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                try {
+                    cursor = db.query("Information", new String[]{"weatherString"}, "county_name = ?", new String[]{weatherId}, null, null, null);
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            String weatherString = cursor.getString(cursor.getColumnIndex("weatherString"));
+                            if (!TextUtils.isEmpty(weatherString)) {
+                                Weather weather = Utility.handleWeatherResponse(weatherString);
+                                if (weather != null && TextUtils.equals("ok", weather.status)) {
+                                    setWeatherInformation(weather);
+                                }
+                            } else {
+                                requestWeather(weatherId, weatherId);
+                            }
+                        }
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        cursor.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
+
     public void requestWeather(final String weatherId, final String countyName) {
         if (!TextUtils.isEmpty(weatherId)) {
             String weatherUrl = URLSTART + weatherId + URLEND;
@@ -147,40 +192,79 @@ public class ShowWeatherFragment extends Fragment {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     final String responseText = response.body().string();
-                    final Weather weather = Utility.handleWeatherResponse(responseText);
-                    mAcitvity.runOnUiThread(new Runnable() {
+                    weather = Utility.handleWeatherResponse(responseText);
+                    new Thread(new Runnable() {
                         @Override
                         public void run() {
                             if (weather != null && TextUtils.equals("ok", weather.status)) {
-                                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mAcitvity).edit();
-                                editor.putString(weatherId, responseText);
-                                editor.apply();
-                                showWeatherInformation(weather);
+                                ContentValues values = new ContentValues();
+                                values.clear();
+                                values.put("status", weather.now.cond_txt);
+                                values.put("degree", weather.now.tmp);
+                                values.put("weatherString", responseText);
+                                try {
+                                    db.update("Information", values, "county_name = ?", new String[]{countyName});
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                closeProgressDialog();
+                                Message message = new Message();
+                                message.what = SUCCESS;
+                                handler.sendMessage(message);
                             } else {
                                 Toast.makeText(getActivity(), "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                                closeProgressDialog();
                             }
                         }
-                    });
+                    }).start();
                 }
 
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    mAcitvity.runOnUiThread(new Runnable() {
+                    new Thread(new Runnable() {
                         @Override
                         public void run() {
                             mTitleCity.setText(countyName);
-                            mWeatherFragment.setVisibility(View.GONE);
-                            mLinkedNetwork.setVisibility(View.VISIBLE);
-//                          mFragmentView.setBackgroundResource(R.drawable.ic_broken_network);
-                            Toast.makeText(getActivity(), "更新天气信息失败", Toast.LENGTH_SHORT).show();
+                            try {
+                                cursor = db.query("Information", new String[]{"weatherString"}, "county_name = ?", new String[]{weatherId}, null, null, null);
+                                if (cursor != null) {
+                                    if (cursor.moveToFirst()) {
+                                        String weatherString = cursor.getString(cursor.getColumnIndex("weatherString"));
+                                        if (!TextUtils.isEmpty(weatherString)) {
+                                            weather = Utility.handleWeatherResponse(weatherString);
+                                            if (weather != null && TextUtils.equals("ok", weather.status)) {
+
+                                                Message message = new Message();
+                                                message.what = SUCCESS;
+                                                handler.sendMessage(message);
+                                                closeProgressDialog();
+                                                Toast.makeText(getActivity(), "刷新失败", Toast.LENGTH_SHORT).show();
+                                            }
+                                        } else {
+                                            mWeatherFragment.setVisibility(View.GONE);
+                                            closeProgressDialog();
+                                            Toast.makeText(getActivity(), "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            } finally {
+                                try {
+                                    cursor.close();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
-                    });
+                    }).start();
                 }
             });
         }
     }
 
-    public void showWeatherInformation(Weather weather) {
+    public void setWeatherInformation(Weather weather) {
+        mWeatherFragment.setVisibility(View.VISIBLE);
         if (weather != null) {
             mAQIValue.setText("无");
             mAirQualityValue.setText("无");
@@ -259,21 +343,6 @@ public class ShowWeatherFragment extends Fragment {
         }
     }
 
-//    public int Time(String string) {
-//        if (!TextUtils.isEmpty(string)) {
-//            if (string.length() > 4) {
-//                try {
-//                    String detailedTime = string.substring(0, 2);
-//                    return Integer.parseInt(detailedTime);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                    return 0;
-//                }
-//            }
-//        }
-//        return 0;
-//    }
-
     public void setTime(String sr, String ss) {
         if (!TextUtils.isEmpty(sr) && !TextUtils.isEmpty(ss)) {
             SimpleDateFormat format = new SimpleDateFormat("HH:mm");
@@ -319,4 +388,20 @@ public class ShowWeatherFragment extends Fragment {
             }
         }
     }
+
+    private void showProgressDialog() {
+        if (progressDidog == null) {
+            progressDidog = new ProgressDialog(getActivity());
+            progressDidog.setMessage("正在刷新...");
+            progressDidog.setCanceledOnTouchOutside(false);
+        }
+        progressDidog.show();
+    }
+
+    private void closeProgressDialog() {
+        if (progressDidog != null) {
+            progressDidog.dismiss();
+        }
+    }
+
 }
