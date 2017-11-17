@@ -48,6 +48,7 @@ public class ShowWeatherFragment extends Fragment {
     private static final String URLSTART = "https://free-api.heweather.com/s6/weather?location=";
     private static final String URLEND = "&key=168d59faf85840c0b262b671067367e1";
     private static final int SUCCESS = 1;
+    private static final int UNSUCCESS = 2;
     private TextView mTitleCity;
     private TextView mTitleNowCond;
     private TextView mTitleNowDegree;
@@ -69,7 +70,7 @@ public class ShowWeatherFragment extends Fragment {
     private TextView mAirQualityValue;
     private LinearLayout mDailyForecast;
 
-    private static Weather weather;
+    private Weather weather;
     private ProgressDialog progressDidog;
     private Button mWeatherReflesh;
     private LinearLayout mFragmentView;
@@ -84,6 +85,14 @@ public class ShowWeatherFragment extends Fragment {
             switch (msg.what) {
                 case SUCCESS:
                     setWeatherInformation(weather);
+                    break;
+                case UNSUCCESS:
+                    mTitleCity.setText(weatherId);
+                    mWeatherFragment.setVisibility(View.GONE);
+                    Toast.makeText(getActivity(), "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
             }
         }
     };
@@ -192,6 +201,7 @@ public class ShowWeatherFragment extends Fragment {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     final String responseText = response.body().string();
+                    weather = new Weather();
                     weather = Utility.handleWeatherResponse(responseText);
                     new Thread(new Runnable() {
                         @Override
@@ -224,16 +234,16 @@ public class ShowWeatherFragment extends Fragment {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            mTitleCity.setText(countyName);
+//                            mTitleCity.setText(countyName);
                             try {
                                 cursor = db.query("Information", new String[]{"weatherString"}, "county_name = ?", new String[]{weatherId}, null, null, null);
                                 if (cursor != null) {
                                     if (cursor.moveToFirst()) {
                                         String weatherString = cursor.getString(cursor.getColumnIndex("weatherString"));
                                         if (!TextUtils.isEmpty(weatherString)) {
+                                            weather = new Weather();
                                             weather = Utility.handleWeatherResponse(weatherString);
                                             if (weather != null && TextUtils.equals("ok", weather.status)) {
-
                                                 Message message = new Message();
                                                 message.what = SUCCESS;
                                                 handler.sendMessage(message);
@@ -241,9 +251,10 @@ public class ShowWeatherFragment extends Fragment {
                                                 Toast.makeText(getActivity(), "刷新失败", Toast.LENGTH_SHORT).show();
                                             }
                                         } else {
-                                            mWeatherFragment.setVisibility(View.GONE);
+                                            Message message = new Message();
+                                            message.what = UNSUCCESS;
+                                            handler.sendMessage(message);
                                             closeProgressDialog();
-                                            Toast.makeText(getActivity(), "获取天气信息失败", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 }
