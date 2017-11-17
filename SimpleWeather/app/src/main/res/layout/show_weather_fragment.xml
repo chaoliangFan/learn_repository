@@ -4,12 +4,22 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
     <LinearLayout
+        android:id="@+id/fragment_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1.0"
         android:orientation="vertical">
 
         <include layout="@layout/title" />
+
+        <Button
+            android:id="@+id/linkde_network"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="重新加载"
+            android:textColor="@color/mainColor"
+            android:background="@color/contentView"/>
 
         <ScrollView
             android:id="@+id/weather_layout"
@@ -19,6 +29,7 @@
             android:scrollbars="none">
 
             <LinearLayout
+                android:id="@+id/weather_fragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">

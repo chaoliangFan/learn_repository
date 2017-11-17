@@ -5,6 +5,6 @@ package com.example.fanxh.simpleweather.gson;
  */
 
 public class Basic {
-    public String parent_city;
+    public String location;
     public String cid;
 }

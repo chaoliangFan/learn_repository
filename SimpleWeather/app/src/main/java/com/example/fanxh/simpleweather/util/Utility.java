@@ -137,6 +137,9 @@ public class Utility {
         }
     }
 
+    /**
+     *获取星期情况
+     */
     @TargetApi(Build.VERSION_CODES.N)
     public static String getWeek(String pTime) {
         String week = "";

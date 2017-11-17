@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/ic_search_area_activity_bg"
     android:orientation="vertical">
+
     <ScrollView
         android:id="@+id/weather_layout"
         android:layout_width="match_parent"
@@ -16,57 +17,46 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <include layout="@layout/choose_area_list"/>
 
-            <include layout="@layout/choose_area_add"/>
+            <com.example.fanxh.simpleweather.ListViewForScorllView
+                android:id="@+id/search_area"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"></com.example.fanxh.simpleweather.ListViewForScorllView>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="15dp"
+                    android:text=" ℃/℉"
+                    android:textSize="20dp" />
+
+                <Button
+                    android:id="@+id/choose_area"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="15dp"
+                    android:background="@drawable/ic_choose_area" />
+
+                <ImageView
+                    android:id="@+id/official_website"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_below="@id/choose_area"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="30dp"
+                    android:src="@drawable/ic_official_website" />
+            </RelativeLayout>
 
         </LinearLayout>
 
     </ScrollView>
-
-<!--    <ListView
-        android:id="@+id/search_area"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"></ListView>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_margin="15dp"
-            android:text=" ℃/℉"
-            android:textSize="20dp" />
-
-        <Button
-            android:id="@+id/choose_area"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_margin="15dp"
-            android:background="@drawable/ic_choose_area" />
-
-        <ImageView
-            android:id="@+id/official_website"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_below="@id/choose_area"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
-            android:src="@drawable/ic_official_website"/>
-    </RelativeLayout>-->
-    <!--<ImageView-->
-        <!--android:id="@+id/official_website"-->
-        <!--android:layout_width="30dp"-->
-        <!--android:layout_height="30dp"-->
-        <!--android:layout_gravity="center_horizontal"-->
-        <!--android:layout_marginTop="15dp"-->
-        <!--android:src="@drawable/ic_official_website"/>-->
-
 
 </LinearLayout>

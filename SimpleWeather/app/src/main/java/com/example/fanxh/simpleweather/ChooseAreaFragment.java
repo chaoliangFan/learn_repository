@@ -20,8 +20,6 @@ import android.widget.Toast;
 import com.example.fanxh.simpleweather.db.City;
 import com.example.fanxh.simpleweather.db.County;
 import com.example.fanxh.simpleweather.db.DbUtil;
-import com.example.fanxh.simpleweather.db.Province;
-import com.example.fanxh.simpleweather.db.SWDatabase;
 import com.example.fanxh.simpleweather.util.HttpUtil;
 import com.example.fanxh.simpleweather.util.Utility;
 
@@ -46,26 +44,9 @@ public class ChooseAreaFragment extends Fragment {
     private Button mBackButton;
     private ListView mShowArea;
     private ArrayAdapter<String> mShowAreaAdapter;
-    private List<String> dataList = new ArrayList<>();
-    private static SWDatabase swDatabase;
+    public final List<String> dataList = new ArrayList<>();
     public static SQLiteDatabase db;
-    /**
-     * 省列表
-     */
-    private List<Province> provinceList;
-    /**
-     * 市列表
-     */
-    private List<City> cityList;
-    /**
-     * 区或县列表
-     */
-    private List<County> countyList;
-    /**
-     * 选中的省份
-     */
     private String selectedProvinceF;
-    private Province selectedProvince;
     /**
      * 选中的城市
      */
@@ -78,6 +59,7 @@ public class ChooseAreaFragment extends Fragment {
      * 当前选中的级别
      */
     public static int currentLevel;
+    public Cursor cursor;
 
     @Nullable
     @Override
@@ -107,7 +89,7 @@ public class ChooseAreaFragment extends Fragment {
                 } else if (currentLevel == LEVEL_COUNTY) {
                     selectedCountyF = dataList.get(position);
                     try {
-                        Cursor cursor = db.query("County", null, "county_name = ?", new String[]{selectedCountyF}, null, null, null);
+                        cursor = db.query("County", null, "county_name = ?", new String[]{selectedCountyF}, null, null, null);
                         if (cursor != null) {
                             if (cursor.moveToFirst()) {
                                 String weatherId = cursor.getString(cursor.getColumnIndex("weatherId"));
@@ -117,14 +99,15 @@ public class ChooseAreaFragment extends Fragment {
                                 getActivity().startActivity(intent);
                             }
                         }
+                        getActivity().finish();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
                         try {
                             cursor.close();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        getActivity().finish();
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
                 }
             }
@@ -154,7 +137,7 @@ public class ChooseAreaFragment extends Fragment {
         mTitleText.setText("中国");
         mBackButton.setVisibility(View.GONE);
         try {
-            Cursor cursor = db.query("Province", null, null, null, null, null, null);
+            cursor = db.query("Province", null, null, null, null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 dataList.clear();
                 do {
@@ -165,17 +148,18 @@ public class ChooseAreaFragment extends Fragment {
                 mShowAreaAdapter.notifyDataSetChanged();
                 mShowArea.setSelection(0);
                 currentLevel = LEVEL_PROVINCE;
-                try {
-                    cursor.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             } else {
                 String address = "http://guolin.tech/api/china";
                 queryFromServe(address, "province");
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                cursor.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -186,7 +170,7 @@ public class ChooseAreaFragment extends Fragment {
         mTitleText.setText(selectedProvinceF);
         mBackButton.setVisibility(View.VISIBLE);
         try {
-            Cursor cursor = db.query("Province", null, "province_name = ?", new String[]{selectedProvinceF}, null, null, null);
+            cursor = db.query("Province", null, "province_name = ?", new String[]{selectedProvinceF}, null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 int provinceCode = cursor.getInt(cursor.getColumnIndex("province_code"));
                 try {
@@ -216,14 +200,14 @@ public class ChooseAreaFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
             try {
                 cursor.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -234,7 +218,7 @@ public class ChooseAreaFragment extends Fragment {
         mTitleText.setText(selectedCityF);
         mBackButton.setVisibility(View.VISIBLE);
         try {
-            Cursor cursor = db.query("City", null, "city_name = ?", new String[]{selectedCityF}, null, null, null);
+            cursor = db.query("City", null, "city_name = ?", new String[]{selectedCityF}, null, null, null);
             if (cursor.moveToFirst()) {
                 int cityCode = cursor.getInt(cursor.getColumnIndex("city_code"));
                 try {
@@ -250,9 +234,9 @@ public class ChooseAreaFragment extends Fragment {
                         currentLevel = LEVEL_COUNTY;
                     } else {
                         try {
-                            Cursor cursor1 = db.query("City", null, "city_name = ?", new String[]{selectedCityF}, null, null, null);
-                            if (cursor1 != null && cursor1.moveToFirst()) {
-                                int provinceCode = cursor1.getInt(cursor1.getColumnIndex("province_id"));
+                            cursor = db.query("City", null, "city_name = ?", new String[]{selectedCityF}, null, null, null);
+                            if (cursor != null && cursor.moveToFirst()) {
+                                int provinceCode = cursor.getInt(cursor.getColumnIndex("province_id"));
                                 String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
                                 queryFromServe(address, "county");
                             }
@@ -264,13 +248,14 @@ public class ChooseAreaFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
             try {
                 cursor.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -301,33 +286,35 @@ public class ChooseAreaFragment extends Fragment {
                     result = Utility.handleProvincesResponse(responseText, db);
                 } else if ("city".equals(type)) {
                     try {
-                        Cursor cursor = db.query("Province", null, "province_name = ?", new String[]{selectedProvinceF}, null, null, null);
+                        cursor = db.query("Province", null, "province_name = ?", new String[]{selectedProvinceF}, null, null, null);
                         if (cursor != null && cursor.moveToFirst()) {
                             int provinceCode = cursor.getInt(cursor.getColumnIndex("province_code"));
                             result = Utility.handleCitiesResponse(responseText, provinceCode, db);
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
                         try {
                             cursor.close();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
                 } else if ("county".equals(type)) {
                     try {
-                        Cursor cursor = db.query("City", null, "city_name = ?", new String[]{selectedCityF}, null, null, null);
+                        cursor = db.query("City", null, "city_name = ?", new String[]{selectedCityF}, null, null, null);
                         if (cursor != null && cursor.moveToFirst()) {
                             int cityCode = cursor.getInt(cursor.getColumnIndex("city_code"));
                             result = Utility.handleCountiesResponse(responseText, cityCode, db);
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
                         try {
                             cursor.close();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
                 }
                 if (result) {

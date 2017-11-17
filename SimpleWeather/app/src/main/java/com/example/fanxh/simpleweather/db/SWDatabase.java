@@ -32,7 +32,7 @@ public class SWDatabase extends SQLiteOpenHelper {
             +"status text,"
             +"degree text)";
 
-    public SWDatabase(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+    private SWDatabase(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
 
@@ -40,7 +40,7 @@ public class SWDatabase extends SQLiteOpenHelper {
 //        super(context, DATABASE_NAME, null, VERSION);
 //    }
 
-    static synchronized SWDatabase getDBInstance(Context context) {
+    public static synchronized SWDatabase getDBInstance(Context context) {
         if (swDatabase == null) {
             swDatabase = new SWDatabase(context,DATABASE_NAME,null,VERSION);
         }

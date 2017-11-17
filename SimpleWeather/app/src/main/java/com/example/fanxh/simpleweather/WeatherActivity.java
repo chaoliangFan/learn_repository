@@ -26,6 +26,7 @@ public class WeatherActivity extends FragmentActivity {
     private ViewPager mShowAllWeather;
     private static List<ShowWeatherFragment> fragmentList;
     private static SQLiteDatabase db;
+    private Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +56,7 @@ public class WeatherActivity extends FragmentActivity {
         fragmentList = new ArrayList<>();
         fragmentList.clear();
         try {
-            Cursor cursor = db.query("Information", null, null, null, null, null, null);
+            cursor = db.query("Information", null, null, null, null, null, null);
             if (cursor != null) {
                 if (cursor.moveToFirst()) {
                     do {
@@ -65,13 +66,15 @@ public class WeatherActivity extends FragmentActivity {
                     } while (cursor.moveToNext());
                 }
             }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
             try {
                 cursor.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         mShowAllWeather.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -89,8 +92,10 @@ public class WeatherActivity extends FragmentActivity {
         });
         mShowAllWeather.setOffscreenPageLimit(fragmentList.size());
         mShowAllWeather.setAdapter(new ShowWeatherFragmentAdapter(getSupportFragmentManager(), fragmentList));
-        int item = getIntent().getIntExtra("item", 0);
-        mShowAllWeather.setCurrentItem(item);
+        if (getIntent() != null) {
+            int item = getIntent().getIntExtra("item", 0);
+            mShowAllWeather.setCurrentItem(item);
+        }
     }
 
     public class ShowWeatherFragmentAdapter extends FragmentStatePagerAdapter {

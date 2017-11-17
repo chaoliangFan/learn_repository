@@ -14,6 +14,7 @@ import static com.example.fanxh.simpleweather.ChooseAreaFragment.LEVEL_COUNTY;
 
 public class MainActivity extends AppCompatActivity {
     private static SQLiteDatabase db;
+    private Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
         db = DbUtil.getDb(this);
         try {
-            Cursor cursor = db.query("Information", null, null, null, null, null, null);
+            cursor = db.query("Information", null, null, null, null, null, null);
             if (cursor != null) {
                 if (cursor.moveToFirst()) {
                     Intent intent = new Intent(this, WeatherActivity.class);
@@ -30,19 +31,24 @@ public class MainActivity extends AppCompatActivity {
                     finish();
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
             try {
                 cursor.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
     public void onBackPressed() {
         ChooseAreaFragment mCAFragment = (ChooseAreaFragment) getFragmentManager().findFragmentById(R.id.choose_area_fragment);
         if (mCAFragment.currentLevel == LEVEL_COUNTY) {
+            int i = mCAFragment.dataList.size();
             mCAFragment.queryCities();
+            if (mCAFragment.dataList.size() == i ) {
+                mCAFragment.queryProvinces();
+            }
         } else if (mCAFragment.currentLevel == LEVEL_CITY) {
             mCAFragment.queryProvinces();
         } else {

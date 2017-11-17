@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,6 +25,10 @@ import com.example.fanxh.simpleweather.util.HttpUtil;
 import com.example.fanxh.simpleweather.util.Utility;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -57,6 +62,11 @@ public class ShowWeatherFragment extends Fragment {
     private TextView mAQIValue;
     private TextView mAirQualityValue;
     private LinearLayout mDailyForecast;
+
+    private Button mLinkedNetwork;
+    private LinearLayout mFragmentView;
+    private LinearLayout mWeatherFragment;
+
     private Activity mAcitvity;
     private static HourlyForecastAdapter mHourlyForecastAdapter;
     public String weatherId;
@@ -79,6 +89,10 @@ public class ShowWeatherFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.show_weather_fragment, container, false);
 
+        mLinkedNetwork = (Button) view.findViewById(R.id.linkde_network);
+        mFragmentView = (LinearLayout) view.findViewById(R.id.fragment_view);
+        mWeatherFragment = (LinearLayout) view.findViewById(R.id.weather_fragment);
+
         mTitleCity = (TextView) view.findViewById(R.id.title_city);
         mTitleDate = (TextView) view.findViewById(R.id.title_date);
         mTitleDegree = (TextView) view.findViewById(R.id.title_degree);
@@ -99,6 +113,8 @@ public class ShowWeatherFragment extends Fragment {
         mAQIValue = (TextView) view.findViewById(R.id.aqi_value);
         mAirQualityValue = (TextView) view.findViewById(R.id.air_quality_value);
         mDailyForecast = (LinearLayout) view.findViewById(R.id.daily_forecast_item);
+
+        mLinkedNetwork.setVisibility(View.GONE);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mAcitvity);
         String weatherString = prefs.getString(weatherId, null);
@@ -153,7 +169,10 @@ public class ShowWeatherFragment extends Fragment {
                         @Override
                         public void run() {
                             mTitleCity.setText(countyName);
-                            Toast.makeText(getActivity(), "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                            mWeatherFragment.setVisibility(View.GONE);
+                            mLinkedNetwork.setVisibility(View.VISIBLE);
+//                          mFragmentView.setBackgroundResource(R.drawable.ic_broken_network);
+                            Toast.makeText(getActivity(), "更新天气信息失败", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -166,7 +185,9 @@ public class ShowWeatherFragment extends Fragment {
             mAQIValue.setText("无");
             mAirQualityValue.setText("无");
             if (weather.basic != null) {
-                mTitleCity.setText(weather.basic.parent_city);
+                mTitleCity.setText(weather.basic.location);
+            }
+            if (weather.now != null) {
                 mTitleNowCond.setText(weather.now.cond_txt);
                 if (!TextUtils.isEmpty(weather.now.tmp)) {
                     mTitleNowDegree.setText(weather.now.tmp + "°");
@@ -179,7 +200,7 @@ public class ShowWeatherFragment extends Fragment {
                 mHourlyForecastAdapter = new HourlyForecastAdapter(weather.hourly);
                 mHourlyItem.setAdapter(mHourlyForecastAdapter);
             }
-            if (weather.daily_forecast != null && weather.daily_forecast.size() != 0 && weather.daily_forecast.get(0) != null) {
+            if (weather.daily_forecast != null && weather.daily_forecast.size() != 0) {
                 DailyForecast dailyForecast = weather.daily_forecast.get(0);
                 mDailyForecast.removeAllViews();
                 for (int i = 0; i < 3; i++) {
@@ -200,61 +221,102 @@ public class ShowWeatherFragment extends Fragment {
                         }
                         mDailyForecast.addView(view);
                     }
-                    mTitleDegree.setText(dailyForecast.tmp_max + "  " + dailyForecast.tmp_min);
-                    if (!TextUtils.isEmpty(dailyForecast.date)) {
-                        mTitleDate.setText("星期" + Utility.getWeek(dailyForecast.date) + "  今天");
-                    }
-                    if (weather.now != null && !TextUtils.isEmpty(weather.now.cond_txt) && !TextUtils.isEmpty(dailyForecast.tmp_max)) {
-                        mWeatherDescribe.setText("今天: 当前" + weather.now.cond_txt + "。 最高气温" + dailyForecast.tmp_max + "°。 今晚" + dailyForecast.cond_txt_n + "， 最低气温" + dailyForecast.tmp_min + "。");
-                    }
-                    if (dailyForecast.sr.length() == 5 && dailyForecast.ss.length() == 5) {
-                        if (Time(dailyForecast.sr) < 12) {
-                            mSunriseValue.setText("上午" + dailyForecast.sr.substring(1, 5));
-                        }
-                        if (Time(dailyForecast.ss) > 12) {
-                            mSunsetValue.setText("下午" + Integer.toString(Time(dailyForecast.ss) - 12) + dailyForecast.ss.substring(2, 5));
-                        }
-                    }
-                    if (!TextUtils.isEmpty(dailyForecast.pcpn)) {
-                        mRainfallProbabilityValue.setText(weather.daily_forecast.get(0).pcpn + "%");
-                    }
-                    if (!TextUtils.isEmpty(dailyForecast.hum)) {
-                        mHumidityValue.setText(dailyForecast.hum + "%");
-                    }
-                    if (!TextUtils.isEmpty(dailyForecast.wind_dir) && !TextUtils.isEmpty(dailyForecast.wind_spd)) {
-                        mAirSpeedValue.setText(dailyForecast.wind_dir + " " + "每秒" + Math.round(Integer.parseInt(dailyForecast.wind_spd) / 3.6) + "米");
-                    }
-                    //         体感温度
-                    //        mSendibleTemperatureValue;
-                    if (!TextUtils.isEmpty(dailyForecast.pop)) {
-                        mPrecipitationValue.setText(dailyForecast.pop + "毫米");
-                    }
-                    if (!TextUtils.isEmpty(dailyForecast.pres)) {
-                        mAirPressureValue.setText(dailyForecast.pres + "百帕");
-                    }
-                    if (!TextUtils.isEmpty(dailyForecast.vis)) {
-                        mVisibilityValue.setText(dailyForecast.vis + "公里");
-                    }
-                    if (!TextUtils.isEmpty(dailyForecast.uv_index)) {
-                        mUltravioletIndexValue.setText(dailyForecast.uv_index);
-                    }
+                }
+                mTitleDegree.setText(dailyForecast.tmp_max + "  " + dailyForecast.tmp_min);
+                if (!TextUtils.isEmpty(dailyForecast.date)) {
+                    mTitleDate.setText("星期" + Utility.getWeek(dailyForecast.date) + "  今天");
+                }
+                if (weather.now != null && !TextUtils.isEmpty(weather.now.cond_txt) && !TextUtils.isEmpty(dailyForecast.tmp_max)) {
+                    mWeatherDescribe.setText("今天: 当前" + weather.now.cond_txt + "。 最高气温" + dailyForecast.tmp_max + "°。 今晚" + dailyForecast.cond_txt_n + "， 最低气温" + dailyForecast.tmp_min + "。");
+                }
+
+                setTime(dailyForecast.sr, dailyForecast.ss);
+
+                if (!TextUtils.isEmpty(dailyForecast.pcpn)) {
+                    mRainfallProbabilityValue.setText(weather.daily_forecast.get(0).pcpn + "%");
+                }
+                if (!TextUtils.isEmpty(dailyForecast.hum)) {
+                    mHumidityValue.setText(dailyForecast.hum + "%");
+                }
+                if (!TextUtils.isEmpty(dailyForecast.wind_dir) && !TextUtils.isEmpty(dailyForecast.wind_spd)) {
+                    mAirSpeedValue.setText(dailyForecast.wind_dir + " " + "每秒" + Math.round(Integer.parseInt(dailyForecast.wind_spd) / 3.6) + "米");
+                }
+                //         体感温度
+                //        mSendibleTemperatureValue;
+                if (!TextUtils.isEmpty(dailyForecast.pop)) {
+                    mPrecipitationValue.setText(dailyForecast.pop + "毫米");
+                }
+                if (!TextUtils.isEmpty(dailyForecast.pres)) {
+                    mAirPressureValue.setText(dailyForecast.pres + "百帕");
+                }
+                if (!TextUtils.isEmpty(dailyForecast.vis)) {
+                    mVisibilityValue.setText(dailyForecast.vis + "公里");
+                }
+                if (!TextUtils.isEmpty(dailyForecast.uv_index)) {
+                    mUltravioletIndexValue.setText(dailyForecast.uv_index);
                 }
             }
         }
     }
 
-    public int Time(String string) {
-        if (!TextUtils.isEmpty(string)) {
-            if (string.length() > 4) {
-                try {
-                    String detailedTime = string.substring(0, 2);
-                    return Integer.parseInt(detailedTime);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return 0;
+//    public int Time(String string) {
+//        if (!TextUtils.isEmpty(string)) {
+//            if (string.length() > 4) {
+//                try {
+//                    String detailedTime = string.substring(0, 2);
+//                    return Integer.parseInt(detailedTime);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    return 0;
+//                }
+//            }
+//        }
+//        return 0;
+//    }
+
+    public void setTime(String sr, String ss) {
+        if (!TextUtils.isEmpty(sr) && !TextUtils.isEmpty(ss)) {
+            SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+            try {
+                Date dateSr = format.parse(sr);
+                Date dateSs = format.parse(ss);
+                Calendar calendarSr = Calendar.getInstance();
+                Calendar calendarSs = Calendar.getInstance();
+                calendarSr.setTime(dateSr);
+                calendarSs.setTime(dateSs);
+                int hourSr = calendarSr.get(Calendar.HOUR_OF_DAY);
+                int minuteSr = calendarSr.get(Calendar.MINUTE);
+                String setMinuteSr = "";
+                if (minuteSr < 10) {
+                    setMinuteSr = "0" + minuteSr;
+                } else {
+                    setMinuteSr = "" + minuteSr;
                 }
+                if (hourSr < 12) {
+                    mSunriseValue.setText("上午" + hourSr + ":" + setMinuteSr);
+                } else if (hourSr == 12) {
+                    mSunriseValue.setText("下午" + hourSr + ":" + setMinuteSr);
+                } else {
+                    mSunriseValue.setText("下午" + String.valueOf(hourSr - 12) + ":" + setMinuteSr);
+                }
+                int hourSs = calendarSs.get(Calendar.HOUR_OF_DAY);
+                int minuteSs = calendarSs.get(Calendar.MINUTE);
+                String setMinuteSs = "";
+                if (minuteSs < 10) {
+                    setMinuteSs = "0" + minuteSs;
+                } else {
+                    setMinuteSs = "" + minuteSs;
+                }
+                if (hourSs < 12) {
+                    mSunsetValue.setText("上午" + hourSs + ":" + setMinuteSs);
+                } else if (hourSs == 12) {
+                    mSunsetValue.setText("下午" + hourSs + ":" + setMinuteSs);
+                } else {
+                    mSunsetValue.setText("下午" + String.valueOf(hourSs - 12) + ":" + setMinuteSs);
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         }
-        return 0;
     }
 }
