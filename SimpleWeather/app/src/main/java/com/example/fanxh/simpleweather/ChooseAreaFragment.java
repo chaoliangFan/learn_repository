@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,6 +66,7 @@ public class ChooseAreaFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.choose_area_fragment, container, false);
+//        CopyDB.copy(getActivity());
         db = DbUtil.getDb(getActivity());
         mTitleText = (TextView) view.findViewById(R.id.title_text);
         mBackButton = (Button) view.findViewById(R.id.back_button);
@@ -138,6 +140,7 @@ public class ChooseAreaFragment extends Fragment {
         mBackButton.setVisibility(View.GONE);
         try {
             cursor = db.query("Province", null, null, null, null, null, null);
+
             if (cursor != null && cursor.moveToFirst()) {
                 dataList.clear();
                 do {

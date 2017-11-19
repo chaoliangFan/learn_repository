@@ -48,7 +48,8 @@ public class ShowWeatherFragment extends Fragment {
     private static final String URLSTART = "https://free-api.heweather.com/s6/weather?location=";
     private static final String URLEND = "&key=168d59faf85840c0b262b671067367e1";
     private static final int SUCCESS = 1;
-    private static final int UNSUCCESS = 2;
+    private static final int MSUCCESS = 2;
+    private static final int UNSUCCESS = 3;
     private TextView mTitleCity;
     private TextView mTitleNowCond;
     private TextView mTitleNowDegree;
@@ -85,11 +86,16 @@ public class ShowWeatherFragment extends Fragment {
             switch (msg.what) {
                 case SUCCESS:
                     setWeatherInformation(weather);
+                    Toast.makeText(getActivity(), "刷新成功", Toast.LENGTH_SHORT).show();
+                    break;
+                case MSUCCESS:
+                    setWeatherInformation(weather);
+                    Toast.makeText(getActivity(), "刷新失败", Toast.LENGTH_SHORT).show();
                     break;
                 case UNSUCCESS:
                     mTitleCity.setText(weatherId);
                     mWeatherFragment.setVisibility(View.GONE);
-                    Toast.makeText(getActivity(), "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "更新天气信息失败", Toast.LENGTH_SHORT).show();
                     break;
                 default:
                     break;
@@ -222,7 +228,6 @@ public class ShowWeatherFragment extends Fragment {
                                 message.what = SUCCESS;
                                 handler.sendMessage(message);
                             } else {
-                                Toast.makeText(getActivity(), "获取天气信息失败", Toast.LENGTH_SHORT).show();
                                 closeProgressDialog();
                             }
                         }
@@ -245,10 +250,9 @@ public class ShowWeatherFragment extends Fragment {
                                             weather = Utility.handleWeatherResponse(weatherString);
                                             if (weather != null && TextUtils.equals("ok", weather.status)) {
                                                 Message message = new Message();
-                                                message.what = SUCCESS;
+                                                message.what = MSUCCESS;
                                                 handler.sendMessage(message);
                                                 closeProgressDialog();
-                                                Toast.makeText(getActivity(), "刷新失败", Toast.LENGTH_SHORT).show();
                                             }
                                         } else {
                                             Message message = new Message();

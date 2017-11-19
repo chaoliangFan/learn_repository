@@ -5,9 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-
 import com.example.fanxh.simpleweather.db.DbUtil;
-import com.example.fanxh.simpleweather.db.SWDatabase;
 
 import static com.example.fanxh.simpleweather.ChooseAreaFragment.LEVEL_CITY;
 import static com.example.fanxh.simpleweather.ChooseAreaFragment.LEVEL_COUNTY;
@@ -19,9 +17,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+        CopyDB.copy(MainActivity.this);
+
+        setContentView(R.layout.activity_main);
         db = DbUtil.getDb(this);
+
         try {
             cursor = db.query("Information", null, null, null, null, null, null);
             if (cursor != null) {
